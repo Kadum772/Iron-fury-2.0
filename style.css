@@ -1,1 +1,407 @@
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #05070a;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  position: fixed;
+}
+
+#game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      #304858 0%,
+      #172832 38%,
+      #080d12 75%,
+      #030406 100%
+    );
+}
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+  position: absolute;
+  top: 10px;
+  left: 3%;
+  right: 3%;
+  height: 60px;
+  z-index: 100;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.fighter-hud {
+  width: 38%;
+}
+
+.fighter-name {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+  text-shadow: 0 2px 5px #000;
+}
+
+.enemy-hud {
+  text-align: right;
+}
+
+.health-bar {
+  width: 100%;
+  height: 18px;
+  padding: 2px;
+
+  background: #080b0e;
+  border: 2px solid #d8e0e4;
+
+  transform: skewX(-10deg);
+  overflow: hidden;
+}
+
+.enemy-hud .health-bar {
+  transform: skewX(10deg);
+}
+
+.health-bar div {
+  width: 100%;
+  height: 100%;
+  transition: width 0.2s ease;
+}
+
+#player-health {
+  background: linear-gradient(
+    90deg,
+    #087d37,
+    #28ef65
+  );
+}
+
+#enemy-health {
+  background: linear-gradient(
+    90deg,
+    #ff5147,
+    #a90000
+  );
+}
+
+.energy-bar {
+  width: 65%;
+  height: 5px;
+  margin-top: 5px;
+  background: #111820;
+  overflow: hidden;
+}
+
+.energy-bar div {
+  width: 25%;
+  height: 100%;
+  background: #20dfff;
+  transition: width 0.2s;
+}
+
+.enemy-hud .energy-bar {
+  margin-left: auto;
+}
+
+.enemy-hud .energy-bar div {
+  background: #ff9d35;
+}
+
+#timer {
+  min-width: 55px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0 3px 8px #000;
+}
+
+/* =========================
+   ARENA
+========================= */
+
+#arena {
+  position: absolute;
+  top: 72px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.background-light {
+  position: absolute;
+  width: 60vw;
+  height: 25vh;
+  left: 20%;
+  top: 12%;
+
+  border-radius: 50%;
+  background: rgba(60, 190, 230, 0.08);
+  filter: blur(35px);
+}
+
+/* =========================
+   FLOOR
+========================= */
+
+#floor {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -5%;
+  height: 45%;
+
+  background:
+    linear-gradient(
+      180deg,
+      #29343b,
+      #090d11
+    );
+
+  transform:
+    perspective(500px)
+    rotateX(35deg);
+
+  transform-origin: bottom;
+  border-top: 3px solid #75838a;
+}
+
+.floor-grid {
+  width: 100%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      rgba(90, 190, 220, 0.12) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(90, 190, 220, 0.12) 1px,
+      transparent 1px
+    );
+
+  background-size: 45px 30px;
+}
+
+/* =========================
+   FIGHTER
+========================= */
+
+.fighter {
+  position: absolute;
+
+  width: 90px;
+  height: 185px;
+
+  left: 23%;
+  bottom: 24%;
+
+  z-index: 30;
+
+  transform-origin: center bottom;
+}
+
+.enemy {
+  left: 68%;
+}
+
+/* SHADOW */
+
+.shadow {
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+
+  width: 90px;
+  height: 15px;
+
+  border-radius: 50%;
+  background: #000;
+  opacity: 0.65;
+  filter: blur(5px);
+}
+
+/* HEAD */
+
+.head {
+  position: absolute;
+  left: 25px;
+  top: 0;
+
+  width: 40px;
+  height: 43px;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #e1aa83,
+      #734431
+    );
+
+  border: 3px solid #111;
+}
+
+.visor {
+  position: absolute;
+
+  left: 5px;
+  top: 14px;
+
+  width: 28px;
+  height: 9px;
+
+  background: #071117;
+
+  border: 2px solid #2bdfff;
+
+  box-shadow: 0 0 8px #2bdfff;
+}
+
+/* BODY */
+
+.body {
+  position: absolute;
+
+  left: 19px;
+  top: 40px;
+
+  width: 52px;
+  height: 68px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #496675,
+      #111d24
+    );
+
+  border: 3px solid #0c1115;
+}
+
+.core {
+  position: absolute;
+
+  left: 17px;
+  top: 20px;
+
+  width: 15px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  background: #27dcff;
+
+  box-shadow: 0 0 15px #27dcff;
+}
+
+/* ENEMY COLORS */
+
+.enemy .body {
+  background:
+    linear-gradient(
+      145deg,
+      #7c353c,
+      #1c0e12
+    );
+}
+
+.enemy .core {
+  background: #ff4638;
+  box-shadow: 0 0 15px #ff4638;
+}
+
+.enemy .visor {
+  border-color: #ff4638;
+  box-shadow: 0 0 8px #ff4638;
+}
+
+/* ARMS */
+
+.arm {
+  position: absolute;
+
+  top: 43px;
+
+  width: 16px;
+  height: 65px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #dba17c,
+      #6c3d2c
+    );
+
+  border: 3px solid #101010;
+
+  transform-origin: top center;
+  transition: transform 0.1s;
+}
+
+.arm-left {
+  left: 3px;
+}
+
+.arm-right {
+  right: 3px;
+}
+
+/* LEGS */
+
+.leg {
+  position: absolute;
+
+  top: 104px;
+
+  width: 20px;
+  height: 76px;
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #3c4850,
+      #090d11
+    );
+
+  border: 3px solid #080a0c;
+
+  transform-origin: top center;
+}
+
+.leg-left {
+ 
