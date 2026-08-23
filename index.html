@@ -5,146 +5,101 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
-  <meta
-    name="theme-color"
-    content="#05080b"
-  >
+  <title>Iron Fury</title>
 
-  <title>IRON FURY</title>
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- =====================================================
-       GAME ROOT
-  ====================================================== -->
+  <!-- ==============================
+       LOADING SCREEN
+       ============================== -->
+
+  <div id="loadingScreen" class="loading-screen">
+
+    <div class="loading-box">
+
+      <div class="loading-logo">
+        IRON FURY
+      </div>
+
+      <div
+        id="loadingText"
+        class="loading-text"
+      >
+        INITIALIZING ENGINE
+      </div>
+
+      <div class="loading-track">
+        <div
+          id="loadingProgress"
+          class="loading-progress"
+        ></div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==============================
+       GAME
+       ============================== -->
 
   <main id="game">
 
-    <!-- ===================================================
-         3D GAME CANVAS
-    ==================================================== -->
-
-    <canvas
-      id="gameCanvas"
-      aria-label="Iron Fury fighting arena"
-    ></canvas>
+    <canvas id="gameCanvas"></canvas>
 
 
-    <!-- ===================================================
-         LOADING SCREEN
-    ==================================================== -->
-
-    <section
-      id="loadingScreen"
-      class="loading-screen"
-    >
-
-      <div class="loading-content">
-
-        <div class="logo-mark">
-          IF
-        </div>
-
-        <h1>IRON FURY</h1>
-
-        <p id="loadingText">
-          INITIALIZING ENGINE...
-        </p>
-
-        <div class="loading-track">
-          <div
-            id="loadingProgress"
-            class="loading-progress"
-          ></div>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
+    <!-- ============================
          TOP HUD
-    ==================================================== -->
+         ============================ -->
 
-    <header class="hud">
+    <section class="hud">
 
       <!-- PLAYER -->
-      <section class="fighter-hud player-hud">
 
-        <div class="fighter-info">
+      <div class="fighter-hud player-hud">
 
-          <div class="portrait player-portrait">
-            IF
+        <div class="fighter-name">
+          IRON FURY
+        </div>
+
+        <div class="bar-row">
+
+          <div class="bar health-bar">
+            <div
+              id="playerHealth"
+              class="bar-fill"
+            ></div>
           </div>
 
-          <div>
-            <div class="fighter-name">
-              IRON FURY
-            </div>
-
-            <div class="fighter-status">
-              PLAYER
-            </div>
-          </div>
+          <span id="playerHealthText">
+            100
+          </span>
 
         </div>
 
-        <div class="bars">
+        <div class="bar-row">
 
-          <div class="bar-row health-row">
-
-            <span class="bar-label">
-              HP
-            </span>
-
-            <div class="bar">
-              <div
-                id="playerHealth"
-                class="bar-fill health-fill"
-                style="width:100%"
-              ></div>
-            </div>
-
-            <span id="playerHealthText">
-              100
-            </span>
-
+          <div class="bar vitality-bar">
+            <div
+              id="playerVitality"
+              class="bar-fill"
+            ></div>
           </div>
 
-          <div class="bar-row vitality-row">
-
-            <span class="bar-label">
-              VIT
-            </span>
-
-            <div class="bar">
-              <div
-                id="playerVitality"
-                class="bar-fill vitality-fill"
-                style="width:100%"
-              ></div>
-            </div>
-
-            <span id="playerVitalityText">
-              100
-            </span>
-
-          </div>
+          <span id="playerVitalityText">
+            100
+          </span>
 
         </div>
 
-        <!-- THREE FURY LEVELS -->
-        <div class="fury-system">
+        <div class="fury-row">
 
           <span class="fury-label">
             FURY
@@ -152,20 +107,9 @@
 
           <div class="fury-slots">
 
-            <span
-              id="fury1"
-              class="fury-slot"
-            ></span>
-
-            <span
-              id="fury2"
-              class="fury-slot"
-            ></span>
-
-            <span
-              id="fury3"
-              class="fury-slot"
-            ></span>
+            <span id="fury1" class="fury-slot"></span>
+            <span id="fury2" class="fury-slot"></span>
+            <span id="fury3" class="fury-slot"></span>
 
           </div>
 
@@ -175,14 +119,15 @@
 
         </div>
 
-      </section>
+      </div>
 
 
-      <!-- CENTER -->
-      <section class="center-hud">
+      <!-- TIMER -->
 
-        <div class="game-logo">
-          IRON FURY
+      <div class="round-hud">
+
+        <div class="round-label">
+          ROUND <span id="roundNumber">1</span>
         </div>
 
         <div
@@ -192,93 +137,48 @@
           60
         </div>
 
-        <div
-          id="roundNumber"
-          class="round-number"
-        >
-          ROUND 1
-        </div>
-
-        <button
-          id="pauseButton"
-          class="pause-button"
-          type="button"
-          aria-label="Pause game"
-        >
-          <span></span>
-          <span></span>
-        </button>
-
-      </section>
+      </div>
 
 
       <!-- ENEMY -->
-      <section class="fighter-hud enemy-hud">
 
-        <div class="fighter-info">
+      <div class="fighter-hud enemy-hud">
 
-          <div>
-            <div class="fighter-name">
-              RIVAL
-            </div>
+        <div class="fighter-name">
+          RIVAL
+        </div>
 
-            <div class="fighter-status">
-              CPU
-            </div>
-          </div>
+        <div class="bar-row">
 
-          <div class="portrait enemy-portrait">
-            RF
+          <span id="enemyHealthText">
+            100
+          </span>
+
+          <div class="bar health-bar">
+            <div
+              id="enemyHealth"
+              class="bar-fill"
+            ></div>
           </div>
 
         </div>
 
-        <div class="bars">
+        <div class="bar-row">
 
-          <div class="bar-row health-row">
+          <span id="enemyVitalityText">
+            100
+          </span>
 
-            <span id="enemyHealthText">
-              100
-            </span>
-
-            <div class="bar">
-              <div
-                id="enemyHealth"
-                class="bar-fill enemy-health-fill"
-                style="width:100%"
-              ></div>
-            </div>
-
-            <span class="bar-label">
-              HP
-            </span>
-
-          </div>
-
-          <div class="bar-row vitality-row">
-
-            <span id="enemyVitalityText">
-              100
-            </span>
-
-            <div class="bar">
-              <div
-                id="enemyVitality"
-                class="bar-fill enemy-vitality-fill"
-                style="width:100%"
-              ></div>
-            </div>
-
-            <span class="bar-label">
-              VIT
-            </span>
-
+          <div class="bar vitality-bar">
+            <div
+              id="enemyVitality"
+              class="bar-fill"
+            ></div>
           </div>
 
         </div>
 
-        <!-- THREE ENEMY FURY LEVELS -->
-        <div class="fury-system enemy-fury-system">
+        <div class="fury-row enemy-fury-row">
 
           <span id="enemyFuryText">
             0 / 3
@@ -309,59 +209,60 @@
 
         </div>
 
-      </section>
+      </div>
 
-    </header>
+    </section>
 
 
-    <!-- ===================================================
-         ROUND / COMBAT MESSAGE
-    ==================================================== -->
+    <!-- ============================
+         CENTER MESSAGES
+         ============================ -->
 
-    <section
-      class="combat-message"
-      aria-live="polite"
-    >
+    <div class="center-message">
 
       <div
         id="message"
-        class="message-title"
-      ></div>
+        class="message"
+      >
+        IRON FURY
+      </div>
 
       <div
         id="subMessage"
-        class="message-subtitle"
-      ></div>
+        class="sub-message"
+      >
+        FIGHT
+      </div>
 
-    </section>
+    </div>
 
 
-    <!-- ===================================================
-         COMBO DISPLAY
-    ==================================================== -->
+    <!-- ============================
+         COMBO
+         ============================ -->
 
-    <section
+    <div
       id="comboCounter"
       class="combo-counter"
     >
-
-      <span
-        id="comboNumber"
-        class="combo-number"
-      >
-        0
-      </span>
-
-      <span class="combo-label">
-        HIT COMBO
-      </span>
-
-    </section>
+      <strong id="comboNumber">0</strong>
+      <span>HIT COMBO</span>
+    </div>
 
 
-    <!-- ===================================================
-         DAMAGE DISPLAY
-    ==================================================== -->
+    <!-- ============================
+         DAMAGE
+         ============================ -->
+
+    <div
+      id="damageFlash"
+      class="damage-flash"
+    ></div>
+
+    <div
+      id="furyFlash"
+      class="fury-flash"
+    ></div>
 
     <div
       id="damageNumber"
@@ -371,48 +272,31 @@
     </div>
 
 
-    <!-- ===================================================
-         DAMAGE FLASH
-    ==================================================== -->
+    <!-- ============================
+         PAUSE
+         ============================ -->
 
-    <div
-      id="damageFlash"
-      class="screen-effect damage-flash"
-    ></div>
-
-    <div
-      id="furyFlash"
-      class="screen-effect fury-flash"
-    ></div>
-
-
-    <!-- ===================================================
-         MOBILE JOYSTICK
-    ==================================================== -->
-
-    <section
-      id="joystick"
-      class="joystick"
-      aria-label="Movement joystick"
+    <button
+      id="pauseButton"
+      class="pause-button"
+      type="button"
     >
+      II
+    </button>
 
-      <div class="joystick-ring">
 
-        <div class="joystick-direction up">
-          ▲
-        </div>
+    <!-- ============================
+         MOBILE CONTROLS
+         ============================ -->
 
-        <div class="joystick-direction down">
-          ▼
-        </div>
+    <section class="mobile-controls">
 
-        <div class="joystick-direction left">
-          ◀
-        </div>
+      <!-- JOYSTICK -->
 
-        <div class="joystick-direction right">
-          ▶
-        </div>
+      <div
+        id="joystick"
+        class="joystick"
+      >
 
         <div
           id="joystickKnob"
@@ -421,104 +305,57 @@
 
       </div>
 
-    </section>
 
+      <!-- ACTION BUTTONS -->
 
-    <!-- ===================================================
-         ACTION BUTTONS
-    ==================================================== -->
-
-    <section
-      class="actions"
-      aria-label="Combat controls"
-    >
-
-      <button
-        id="jumpButton"
-        class="action-button jump-button"
-        type="button"
-      >
-        <strong>▲</strong>
-        <span>JUMP</span>
-      </button>
-
-      <button
-        id="dashButton"
-        class="action-button dash-button"
-        type="button"
-      >
-        <strong>✦</strong>
-        <span>DASH</span>
-      </button>
-
-      <button
-        id="punchButton"
-        class="action-button punch-button"
-        type="button"
-      >
-        <strong>✊</strong>
-        <span>PUNCH</span>
-      </button>
-
-      <button
-        id="kickButton"
-        class="action-button kick-button"
-        type="button"
-      >
-        <strong>🦵</strong>
-        <span>KICK</span>
-      </button>
-
-      <button
-        id="blockButton"
-        class="action-button block-button"
-        type="button"
-      >
-        <strong>◈</strong>
-        <span>BLOCK</span>
-      </button>
-
-      <button
-        id="furyButton"
-        class="action-button fury-button"
-        type="button"
-      >
-        <strong>⚡</strong>
-        <span>FURY</span>
-      </button>
-
-    </section>
-
-
-    <!-- ===================================================
-         FURY FINISH PROMPT
-    ==================================================== -->
-
-    <section
-      id="finishOverlay"
-      class="modal-overlay hidden"
-    >
-
-      <div class="modal-card finish-card">
-
-        <div class="modal-icon">
-          ⚡
-        </div>
-
-        <h2 id="finishTitle">
-          FURY FINISH
-        </h2>
-
-        <p id="finishSubtitle">
-          THE RIVAL IS VULNERABLE
-        </p>
+      <div class="action-buttons">
 
         <button
-          id="finishButton"
-          class="modal-button fury-modal-button"
+          id="jumpButton"
+          class="control-button jump"
           type="button"
         >
-          FINISH
+          ↑
+        </button>
+
+        <button
+          id="dashButton"
+          class="control-button dash"
+          type="button"
+        >
+          D
+        </button>
+
+        <button
+          id="punchButton"
+          class="control-button punch"
+          type="button"
+        >
+          P
+        </button>
+
+        <button
+          id="kickButton"
+          class="control-button kick"
+          type="button"
+        >
+          K
+        </button>
+
+        <button
+          id="blockButton"
+          class="control-button block"
+          type="button"
+        >
+          B
+        </button>
+
+        <button
+          id="furyButton"
+          class="control-button fury"
+          type="button"
+        >
+          FURY
         </button>
 
       </div>
@@ -526,32 +363,21 @@
     </section>
 
 
-    <!-- ===================================================
+    <!-- ============================
          PAUSE MENU
-    ==================================================== -->
+         ============================ -->
 
-    <section
+    <div
       id="pauseMenu"
-      class="modal-overlay hidden"
+      class="overlay hidden"
     >
 
-      <div class="modal-card">
+      <div class="overlay-box">
 
-        <div class="modal-icon">
-          ❚❚
-        </div>
-
-        <h2>
-          PAUSED
-        </h2>
-
-        <p>
-          IRON FURY
-        </p>
+        <h1>PAUSED</h1>
 
         <button
           id="resumeButton"
-          class="modal-button"
           type="button"
         >
           RESUME
@@ -559,7 +385,6 @@
 
         <button
           id="pauseRestartButton"
-          class="modal-button secondary"
           type="button"
         >
           RESTART
@@ -567,66 +392,80 @@
 
       </div>
 
-    </section>
+    </div>
 
 
-    <!-- ===================================================
-         RESULT SCREEN
-    ==================================================== -->
+    <!-- ============================
+         FINISH SCREEN
+         ============================ -->
 
-    <section
-      id="resultOverlay"
-      class="modal-overlay hidden"
+    <div
+      id="finishOverlay"
+      class="overlay hidden"
     >
 
-      <div class="modal-card result-card">
+      <div class="overlay-box finish-box">
 
-        <div class="modal-icon">
-          IF
-        </div>
+        <h1 id="finishTitle">
+          FURY FINISH
+        </h1>
 
-        <h2 id="resultTitle">
+        <p id="finishSubtitle">
+          THE RIVAL IS DEFEATED
+        </p>
+
+        <button
+          id="finishButton"
+          type="button"
+        >
+          FINISH
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ============================
+         RESULT SCREEN
+         ============================ -->
+
+    <div
+      id="resultOverlay"
+      class="overlay hidden"
+    >
+
+      <div class="overlay-box">
+
+        <h1 id="resultTitle">
           VICTORY
-        </h2>
+        </h1>
 
         <p id="resultDescription">
-          THE ARENA BELONGS TO YOU
+          FIGHT COMPLETE
         </p>
 
         <div class="result-stats">
 
-          <div class="result-stat">
-            <strong id="resultCombo">
-              0
-            </strong>
-            <span>
-              MAX COMBO
-            </span>
+          <div>
+            <span>MAX COMBO</span>
+            <strong id="resultCombo">0</strong>
           </div>
 
-          <div class="result-stat">
-            <strong id="resultDamage">
-              0
-            </strong>
-            <span>
-              DAMAGE
-            </span>
+          <div>
+            <span>DAMAGE</span>
+            <strong id="resultDamage">0</strong>
           </div>
 
-          <div class="result-stat">
-            <strong id="resultFury">
-              0
-            </strong>
-            <span>
-              FURY
-            </span>
+          <div>
+            <span>FURY USED</span>
+            <strong id="resultFury">0</strong>
           </div>
 
         </div>
 
         <button
           id="restartButton"
-          class="modal-button"
           type="button"
         >
           FIGHT AGAIN
@@ -634,45 +473,20 @@
 
       </div>
 
-    </section>
-
-
-    <!-- ===================================================
-         ACCESSIBILITY / STATUS
-    ==================================================== -->
-
-    <div
-      id="roundStatus"
-      class="sr-only"
-      aria-live="polite"
-    >
-      Round 1
     </div>
 
   </main>
 
 
-  <!-- =====================================================
-       THREE.JS IMPORT MAP
-  ====================================================== -->
-
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-    }
-  }
-  </script>
-
-
-  <!-- =====================================================
-       GAME ENGINE
-  ====================================================== -->
+  <!-- IMPORTANT:
+       Three.js is loaded BEFORE game.js.
+       game.js is loaded as a normal script. -->
 
   <script
-    type="module"
-    src="game.js"
+    src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
   ></script>
+
+  <script src="game.js"></script>
 
 </body>
 </html>
