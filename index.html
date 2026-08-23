@@ -1,1 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no"
+  >
+
+  <title>Iron Fury</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main id="game">
+
+    <!-- HUD -->
+    <section id="hud">
+
+      <div class="fighter-hud player-hud">
+        <div class="fighter-name">FURY</div>
+
+        <div class="health-bar">
+          <div id="player-health"></div>
+        </div>
+
+        <div class="energy-bar">
+          <div id="player-energy"></div>
+        </div>
+      </div>
+
+
+      <div id="timer">60</div>
+
+
+      <div class="fighter-hud enemy-hud">
+        <div class="fighter-name">RIVAL</div>
+
+        <div class="health-bar">
+          <div id="enemy-health"></div>
+        </div>
+
+        <div class="energy-bar">
+          <div id="enemy-energy"></div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ARENA -->
+    <section id="arena">
+
+      <div class="background-light"></div>
+
+      <div id="floor">
+        <div class="floor-grid"></div>
+      </div>
+
+
+      <!-- PLAYER -->
+      <div id="player" class="fighter">
+
+        <div class="shadow"></div>
+
+        <div class="head">
+          <div class="visor"></div>
+        </div>
+
+        <div class="body">
+          <div class="core"></div>
+        </div>
+
+        <div class="arm arm-left"></div>
+        <div class="arm arm-right"></div>
+
+        <div class="leg leg-left"></div>
+        <div class="leg leg-right"></div>
+
+      </div>
+
+
+      <!-- ENEMY -->
+      <div id="enemy" class="fighter enemy">
+
+        <div class="shadow"></div>
+
+        <div class="head">
+          <div class="visor"></div>
+        </div>
+
+        <div class="body">
+          <div class="core"></div>
+        </div>
+
+        <div class="arm arm-left"></div>
+        <div class="arm arm-right"></div>
+
+        <div class="leg leg-left"></div>
+        <div class="leg leg-right"></div>
+
+      </div>
+
+
+      <div id="message"></div>
+
+    </section>
+
+
+    <!-- MOBILE CONTROLS -->
+    <section id="controls">
+
+      <!-- JOYSTICK -->
+      <div id="joystick">
+
+        <div id="joystick-knob"></div>
+
+      </div>
+
+
+      <!-- ACTION BUTTONS -->
+      <div id="buttons">
+
+        <button id="jump" class="action-button jump">
+          ↑
+        </button>
+
+        <button id="dash" class="action-button dash">
+          D
+        </button>
+
+        <button id="special" class="action-button special">
+          ★
+        </button>
+
+        <button id="punch" class="action-button punch">
+          P
+        </button>
+
+        <button id="kick" class="action-button kick">
+          K
+        </button>
+
+        <button id="block" class="action-button block">
+          B
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script src="game.js"></script>
+
+</body>
+</html>
