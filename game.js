@@ -1,25 +1,54 @@
-
 const player = document.getElementById("player");
 const enemy = document.getElementById("enemy");
 
-const playerHealth = document.getElementById("player-health");
-const enemyHealth = document.getElementById("enemy-health");
+const playerHealth =
+  document.getElementById("player-health");
 
-const playerEnergy = document.getElementById("player-energy");
-const enemyEnergy = document.getElementById("enemy-energy");
+const enemyHealth =
+  document.getElementById("enemy-health");
 
-const timerElement = document.getElementById("timer");
-const message = document.getElementById("message");
+const timerElement =
+  document.getElementById("timer");
 
-const joystick = document.getElementById("joystick");
-const knob = document.getElementById("joystick-knob");
+const message =
+  document.getElementById("message");
 
-const jumpButton = document.getElementById("jump");
-const dashButton = document.getElementById("dash");
-const specialButton = document.getElementById("special");
-const punchButton = document.getElementById("punch");
-const kickButton = document.getElementById("kick");
-const blockButton = document.getElementById("block");
+const joystick =
+  document.getElementById("joystick");
+
+const knob =
+  document.getElementById("joystick-knob");
+
+const jumpButton =
+  document.getElementById("jump");
+
+const dashButton =
+  document.getElementById("dash");
+
+const punchButton =
+  document.getElementById("punch");
+
+const kickButton =
+  document.getElementById("kick");
+
+const blockButton =
+  document.getElementById("block");
+
+const specialButton =
+  document.getElementById("special");
+
+
+const furyBars = [
+  document.getElementById("fury1"),
+  document.getElementById("fury2"),
+  document.getElementById("fury3")
+];
+
+const enemyFuryBars = [
+  document.getElementById("enemy-fury1"),
+  document.getElementById("enemy-fury2"),
+  document.getElementById("enemy-fury3")
+];
 
 
 /* =========================
@@ -35,8 +64,9 @@ const game = {
   player: {
     x: 23,
     y: 0,
+
     hp: 100,
-    energy: 25,
+    fury: 0,
 
     velocityY: 0,
 
@@ -48,8 +78,9 @@ const game = {
   enemy: {
     x: 68,
     y: 0,
+
     hp: 100,
-    energy: 25,
+    fury: 0,
 
     velocityY: 0,
 
@@ -61,17 +92,16 @@ const game = {
 };
 
 
-/* =========================
-   JOYSTICK STATE
-========================= */
-
 let stickX = 0;
 let stickY = 0;
+
 let joystickActive = false;
+
+let aiTimer = 0;
 
 
 /* =========================
-   HELPER
+   HELPERS
 ========================= */
 
 function clamp(value, min, max) {
@@ -84,7 +114,7 @@ function clamp(value, min, max) {
 }
 
 
-function distanceBetweenFighters() {
+function distance() {
 
   return Math.abs(
     game.player.x -
@@ -95,13 +125,79 @@ function distanceBetweenFighters() {
 
 
 /* =========================
+   FURY
+========================= */
+
+function updateFuryUI() {
+
+  const p =
+    game.player;
+
+  const e =
+    game.enemy;
+
+
+  furyBars.forEach(
+    (bar, index) => {
+
+      bar.classList.toggle(
+        "full",
+        p.fury >= index + 1
+      );
+
+    }
+  );
+
+
+  enemyFuryBars.forEach(
+    (bar, index) => {
+
+      bar.classList.toggle(
+        "full",
+        e.fury >= index + 1
+      );
+
+    }
+  );
+
+}
+
+
+function addPlayerFury(amount) {
+
+  game.player.fury =
+    clamp(
+      game.player.fury + amount,
+      0,
+      3
+    );
+
+}
+
+
+function addEnemyFury(amount) {
+
+  game.enemy.fury =
+    clamp(
+      game.enemy.fury + amount,
+      0,
+      3
+    );
+
+}
+
+
+/* =========================
    RENDER
 ========================= */
 
 function render() {
 
-  const p = game.player;
-  const e = game.enemy;
+  const p =
+    game.player;
+
+  const e =
+    game.enemy;
 
 
   player.style.left =
@@ -112,10 +208,10 @@ function render() {
 
 
   player.style.bottom =
-    `calc(24% + ${p.y}px)`;
+    `calc(25% + ${p.y}px)`;
 
   enemy.style.bottom =
-    `calc(24% + ${e.y}px)`;
+    `calc(25% + ${e.y}px)`;
 
 
   playerHealth.style.width =
@@ -125,15 +221,8 @@ function render() {
     clamp(e.hp, 0, 100) + "%";
 
 
-  playerEnergy.style.width =
-    clamp(p.energy, 0, 100) + "%";
-
-  enemyEnergy.style.width =
-    clamp(e.energy, 0, 100) + "%";
-
-
   /*
-    Fighters face each other.
+    Face each other.
   */
 
   if (p.x < e.x) {
@@ -150,8 +239,12 @@ function render() {
       "scaleX(-1)";
 
     enemy.style.transform =
-      "scaleX(1)";
+      "scaleX(1");
+
   }
+
+
+  updateFuryUI();
 
 }
 
@@ -160,7 +253,7 @@ function render() {
    JOYSTICK
 ========================= */
 
-function moveJoystick(clientX, clientY) {
+function moveJoystick(x, y) {
 
   const rect =
     joystick.getBoundingClientRect();
@@ -175,41 +268,39 @@ function moveJoystick(clientX, clientY) {
 
 
   let dx =
-    clientX - centerX;
+    x - centerX;
 
   let dy =
-    clientY - centerY;
+    y - centerY;
 
 
-  const maximum =
+  const max =
     rect.width / 2 - 26;
 
 
-  const distance =
+  const d =
     Math.sqrt(
       dx * dx +
       dy * dy
     );
 
 
-  if (distance > maximum) {
+  if (d > max) {
 
     dx =
-      dx / distance *
-      maximum;
+      dx / d * max;
 
     dy =
-      dy / distance *
-      maximum;
+      dy / d * max;
 
   }
 
 
   stickX =
-    dx / maximum;
+    dx / max;
 
   stickY =
-    dy / maximum;
+    dy / max;
 
 
   knob.style.left =
@@ -295,19 +386,14 @@ function updatePlayer(delta) {
 
 
   if (
-    Math.abs(stickX) > 0.08 &&
+    Math.abs(stickX) > .08 &&
     !p.attacking
   ) {
 
-    /*
-      Movement speed.
-    */
-
     p.x +=
       stickX *
-      0.045 *
+      .045 *
       delta;
-
 
     p.x =
       clamp(
@@ -315,7 +401,6 @@ function updatePlayer(delta) {
         5,
         90
       );
-
 
     player.classList.add(
       "walking"
@@ -333,33 +418,6 @@ function updatePlayer(delta) {
 
 
 /* =========================
-   JUMP
-========================= */
-
-jumpButton.addEventListener(
-  "pointerdown",
-  () => {
-
-    const p =
-      game.player;
-
-
-    if (!game.running)
-      return;
-
-
-    if (p.y > 2)
-      return;
-
-
-    p.velocityY =
-      0.72;
-
-  }
-);
-
-
-/* =========================
    PHYSICS
 ========================= */
 
@@ -369,18 +427,11 @@ function updatePhysics(delta) {
     game.player;
 
 
-  /*
-    Gravity.
-  */
-
   p.velocityY -=
-    0.0022 *
-    delta;
-
+    .0022 * delta;
 
   p.y +=
-    p.velocityY *
-    delta;
+    p.velocityY * delta;
 
 
   if (p.y < 0) {
@@ -391,33 +442,29 @@ function updatePhysics(delta) {
 
   }
 
-
-  /*
-    Energy regeneration.
-  */
-
-  p.energy =
-    clamp(
-      p.energy +
-      0.004 * delta,
-      0,
-      100
-    );
-
-
-  const e =
-    game.enemy;
-
-
-  e.energy =
-    clamp(
-      e.energy +
-      0.003 * delta,
-      0,
-      100
-    );
-
 }
+
+
+/* =========================
+   JUMP
+========================= */
+
+jumpButton.addEventListener(
+  "pointerdown",
+  () => {
+
+    if (!game.running)
+      return;
+
+    if (game.player.y > 2)
+      return;
+
+
+    game.player.velocityY =
+      .72;
+
+  }
+);
 
 
 /* =========================
@@ -443,7 +490,6 @@ punchButton.addEventListener(
 
 
     p.attacking = true;
-
     p.cooldown = true;
 
 
@@ -455,8 +501,7 @@ punchButton.addEventListener(
     setTimeout(() => {
 
       if (
-        distanceBetweenFighters()
-        < 14
+        distance() < 15
       ) {
 
         let damage = 10;
@@ -475,6 +520,11 @@ punchButton.addEventListener(
           damage;
 
 
+        addPlayerFury(0.35);
+
+        addEnemyFury(0.12);
+
+
         enemy.classList.add(
           "hit"
         );
@@ -487,14 +537,6 @@ punchButton.addEventListener(
           );
 
         }, 160);
-
-
-        p.energy =
-          clamp(
-            p.energy + 8,
-            0,
-            100
-          );
 
       }
 
@@ -509,14 +551,14 @@ punchButton.addEventListener(
 
       p.attacking = false;
 
-    }, 250);
+    }, 270);
 
 
     setTimeout(() => {
 
       p.cooldown = false;
 
-    }, 350);
+    }, 380);
 
   }
 );
@@ -552,8 +594,7 @@ kickButton.addEventListener(
     setTimeout(() => {
 
       if (
-        distanceBetweenFighters()
-        < 17
+        distance() < 17
       ) {
 
         let damage = 14;
@@ -570,6 +611,11 @@ kickButton.addEventListener(
 
         game.enemy.hp -=
           damage;
+
+
+        addPlayerFury(.45);
+
+        addEnemyFury(.15);
 
 
         enemy.classList.add(
@@ -598,7 +644,7 @@ kickButton.addEventListener(
 
       p.attacking = false;
 
-    }, 300);
+    }, 320);
 
   }
 );
@@ -686,14 +732,26 @@ dashButton.addEventListener(
     );
 
 
-    const direction =
-      stickX < 0
-        ? -1
-        : stickX > 0
+    let direction;
+
+
+    if (
+      Math.abs(stickX) > .1
+    ) {
+
+      direction =
+        stickX < 0
+          ? -1
+          : 1;
+
+    } else {
+
+      direction =
+        p.x < game.enemy.x
           ? 1
-          : p.x < game.enemy.x
-            ? 1
-            : -1;
+          : -1;
+
+    }
 
 
     p.x +=
@@ -728,7 +786,7 @@ dashButton.addEventListener(
 
 
 /* =========================
-   SPECIAL ATTACK
+   3-STAGE FURY
 ========================= */
 
 specialButton.addEventListener(
@@ -745,17 +803,30 @@ specialButton.addEventListener(
     if (p.attacking)
       return;
 
-    if (p.energy < 100)
+    if (p.fury <= 0)
       return;
 
 
-    p.energy = 0;
+    const level =
+      Math.floor(p.fury);
+
+
+    /*
+      Each level uses a different
+      amount of Fury.
+    */
+
+    p.fury -= level;
 
     p.attacking = true;
 
 
     message.textContent =
-      "FURY";
+      level === 1
+        ? "FURY STRIKE"
+        : level === 2
+          ? "FURY COMBO"
+          : "SIGNATURE FURY";
 
 
     player.classList.add(
@@ -766,20 +837,15 @@ specialButton.addEventListener(
     setTimeout(() => {
 
       if (
-        distanceBetweenFighters()
-        < 25
+        distance() < 25
       ) {
 
-        let damage = 30;
-
-
-        if (
-          game.enemy.blocking
-        ) {
-
-          damage = 6;
-
-        }
+        const damage =
+          level === 1
+            ? 18
+            : level === 2
+              ? 28
+              : 42;
 
 
         game.enemy.hp -=
@@ -797,11 +863,11 @@ specialButton.addEventListener(
             "hit"
           );
 
-        }, 180);
+        }, 220);
 
       }
 
-    }, 160);
+    }, 180);
 
 
     setTimeout(() => {
@@ -814,7 +880,7 @@ specialButton.addEventListener(
 
       message.textContent = "";
 
-    }, 600);
+    }, 650);
 
   }
 );
@@ -823,9 +889,6 @@ specialButton.addEventListener(
 /* =========================
    ENEMY AI
 ========================= */
-
-let aiTimer = 0;
-
 
 function updateEnemy(delta) {
 
@@ -843,16 +906,16 @@ function updateEnemy(delta) {
   aiTimer -= delta;
 
 
-  const distance =
-    distanceBetweenFighters();
+  const d =
+    distance();
 
 
   /*
-    Enemy follows player.
+    Follow player.
   */
 
   if (
-    distance > 14 &&
+    d > 15 &&
     !e.attacking &&
     !e.blocking
   ) {
@@ -865,7 +928,7 @@ function updateEnemy(delta) {
 
     e.x +=
       direction *
-      0.018 *
+      .018 *
       delta;
 
 
@@ -891,7 +954,7 @@ function updateEnemy(delta) {
 
 
   /*
-    Enemy decides what to do.
+    AI decision.
   */
 
   if (
@@ -902,16 +965,16 @@ function updateEnemy(delta) {
 
     aiTimer =
       350 +
-      Math.random() * 650;
+      Math.random() * 700;
 
 
-    if (distance < 17) {
+    if (d < 18) {
 
       const choice =
         Math.random();
 
 
-      if (choice < 0.72) {
+      if (choice < .68) {
 
         enemyPunch();
 
@@ -943,7 +1006,6 @@ function enemyPunch() {
 
 
   e.cooldown = true;
-
   e.attacking = true;
 
 
@@ -955,8 +1017,7 @@ function enemyPunch() {
   setTimeout(() => {
 
     if (
-      distanceBetweenFighters()
-      < 16
+      distance() < 16
     ) {
 
       let damage = 9;
@@ -974,6 +1035,25 @@ function enemyPunch() {
       game.player.hp -=
         damage;
 
+
+      addEnemyFury(.3);
+
+      addPlayerFury(.1);
+
+
+      player.classList.add(
+        "hit"
+      );
+
+
+      setTimeout(() => {
+
+        player.classList.remove(
+          "hit"
+        );
+
+      }, 160);
+
     }
 
   }, 110);
@@ -987,7 +1067,7 @@ function enemyPunch() {
 
     e.attacking = false;
 
-  }, 270);
+  }, 280);
 
 
   setTimeout(() => {
@@ -1009,10 +1089,6 @@ function enemyBlock() {
     game.enemy;
 
 
-  if (e.attacking)
-    return;
-
-
   e.blocking = true;
 
 
@@ -1024,7 +1100,6 @@ function enemyBlock() {
   setTimeout(() => {
 
     e.blocking = false;
-
 
     enemy.classList.remove(
       "blocking"
@@ -1052,31 +1127,10 @@ function endRound(text) {
     text;
 
 
-  player.classList.remove(
-    "walking",
-    "punching",
-    "kicking",
-    "blocking",
-    "dashing"
+  setTimeout(
+    resetRound,
+    2200
   );
-
-
-  enemy.classList.remove(
-    "walking",
-    "punching",
-    "blocking"
-  );
-
-
-  /*
-    Automatically restart.
-  */
-
-  setTimeout(() => {
-
-    resetRound();
-
-  }, 2200);
 
 }
 
@@ -1095,7 +1149,7 @@ function resetRound() {
   game.player.x = 23;
   game.player.y = 0;
   game.player.hp = 100;
-  game.player.energy = 25;
+  game.player.fury = 0;
   game.player.velocityY = 0;
   game.player.attacking = false;
   game.player.blocking = false;
@@ -1105,7 +1159,7 @@ function resetRound() {
   game.enemy.x = 68;
   game.enemy.y = 0;
   game.enemy.hp = 100;
-  game.enemy.energy = 25;
+  game.enemy.fury = 0;
   game.enemy.velocityY = 0;
   game.enemy.attacking = false;
   game.enemy.blocking = false;
@@ -1114,9 +1168,7 @@ function resetRound() {
 
   aiTimer = 0;
 
-
   message.textContent = "";
-
 
   render();
 
@@ -1135,7 +1187,6 @@ setInterval(() => {
 
   game.time--;
 
-
   timerElement.textContent =
     Math.max(
       0,
@@ -1150,7 +1201,7 @@ setInterval(() => {
       game.enemy.hp
     ) {
 
-      endRound("FURY WINS");
+      endRound("IRON FURY WINS");
 
     } else if (
       game.enemy.hp >
@@ -1178,17 +1229,16 @@ let lastTime =
   performance.now();
 
 
-function gameLoop(currentTime) {
+function gameLoop(now) {
 
   const delta =
     Math.min(
-      currentTime - lastTime,
+      now - lastTime,
       40
     );
 
 
-  lastTime =
-    currentTime;
+  lastTime = now;
 
 
   if (game.running) {
@@ -1216,7 +1266,7 @@ function gameLoop(currentTime) {
     ) {
 
       endRound(
-        "FURY WINS"
+        "IRON FURY WINS"
       );
 
     }
@@ -1235,7 +1285,7 @@ function gameLoop(currentTime) {
 
 
 /* =========================
-   START GAME
+   START
 ========================= */
 
 render();
