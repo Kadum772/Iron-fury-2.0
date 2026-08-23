@@ -1,27 +1,3 @@
-/* =========================================================
-   IRON FURY
-   POLISHED MOBILE FIGHTING GAME UI
-   ========================================================= */
-
-:root {
-  --bg: #05080b;
-  --panel: rgba(10, 14, 19, 0.88);
-  --panel-light: rgba(25, 31, 38, 0.92);
-  --line: rgba(255, 255, 255, 0.16);
-  --text: #ffffff;
-  --muted: #9ba6b2;
-  --player: #28d7ff;
-  --enemy: #ff3e55;
-  --fury: #ffbd32;
-  --vitality: #9b65ff;
-  --danger: #ff394f;
-  --shadow: rgba(0, 0, 0, 0.65);
-}
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -34,48 +10,40 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--bg);
-  color: var(--text);
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-  user-select: none;
-  -webkit-user-select: none;
+  background: #05080b;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
   touch-action: none;
 }
 
-button {
-  border: 0;
-  outline: 0;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
+body {
+  position: fixed;
+  inset: 0;
 }
 
-/* =========================================================
-   GAME ROOT
-   ========================================================= */
+button {
+  font: inherit;
+  color: white;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =================================
+   GAME
+   ================================= */
 
 #game {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
   overflow: hidden;
-  isolation: isolate;
-  background:
-    radial-gradient(
-      circle at 50% 45%,
-      rgba(31, 50, 65, 0.22),
-      transparent 55%
-    ),
-    #05080b;
 }
-
-/* =========================================================
-   CANVAS
-   ========================================================= */
 
 #gameCanvas {
   position: absolute;
@@ -83,30 +51,33 @@ button {
   width: 100%;
   height: 100%;
   display: block;
-  z-index: 1;
-  touch-action: none;
 }
 
-/* =========================================================
-   LOADING SCREEN
-   ========================================================= */
+
+/* =================================
+   LOADING
+   ================================= */
 
 .loading-screen {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 1000;
-  display: grid;
-  place-items: center;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   background:
     radial-gradient(
       circle at center,
-      #18222c 0%,
-      #080c10 48%,
+      #182530 0%,
+      #080c10 55%,
       #030507 100%
     );
+
   transition:
-    opacity 0.5s ease,
-    visibility 0.5s ease;
+    opacity 0.4s ease,
+    visibility 0.4s ease;
 }
 
 .loading-screen.hidden {
@@ -115,87 +86,58 @@ button {
   pointer-events: none;
 }
 
-.loading-content {
-  width: min(86vw, 460px);
+.loading-box {
+  width: min(520px, 80vw);
   text-align: center;
 }
 
-.logo-mark {
-  width: 82px;
-  height: 82px;
-  margin: 0 auto 18px;
-  display: grid;
-  place-items: center;
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 34px;
+.loading-logo {
+  font-size: clamp(34px, 8vw, 72px);
   font-weight: 900;
-  letter-spacing: 3px;
-  box-shadow:
-    0 0 30px rgba(40, 215, 255, 0.18),
-    inset 0 0 20px rgba(255, 255, 255, 0.04);
-}
-
-.loading-content h1 {
-  font-size: clamp(34px, 8vw, 64px);
-  line-height: 1;
-  font-weight: 1000;
-  letter-spacing: 7px;
+  letter-spacing: 0.16em;
   text-shadow:
-    0 4px 15px rgba(0, 0, 0, 0.8);
+    0 0 15px rgba(40, 215, 255, 0.7),
+    0 0 35px rgba(40, 215, 255, 0.35);
 }
 
-.loading-content p {
-  margin-top: 14px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 3px;
+.loading-text {
+  margin-top: 18px;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  opacity: 0.75;
 }
 
 .loading-track {
-  width: 100%;
-  height: 5px;
-  margin-top: 24px;
-  overflow: hidden;
+  height: 6px;
+  margin-top: 25px;
+  background: #182027;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
 }
 
 .loading-progress {
   width: 0%;
   height: 100%;
-  border-radius: inherit;
-  background: var(--player);
-  box-shadow: 0 0 15px rgba(40, 215, 255, 0.7);
-  transition: width 0.2s ease;
+  background: #28d7ff;
+  box-shadow: 0 0 15px #28d7ff;
+  transition: width 0.1s linear;
 }
 
-/* =========================================================
+
+/* =================================
    HUD
-   ========================================================= */
+   ================================= */
 
 .hud {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   z-index: 20;
+  top: 18px;
+  left: 2%;
+  right: 2%;
 
   display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(100px, 160px)
-    minmax(0, 1fr);
-
-  gap: 12px;
-
-  padding:
-    max(10px, env(safe-area-inset-top))
-    max(12px, env(safe-area-inset-right))
-    0
-    max(12px, env(safe-area-inset-left));
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
 
   pointer-events: none;
 }
@@ -205,360 +147,206 @@ button {
 }
 
 .player-hud {
-  justify-self: start;
-  width: min(100%, 460px);
-}
-
-.enemy-hud {
-  justify-self: end;
-  width: min(100%, 460px);
-}
-
-.fighter-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 38px;
-}
-
-.enemy-hud .fighter-info {
-  justify-content: flex-end;
-  text-align: right;
-}
-
-.portrait {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.12),
-      rgba(255, 255, 255, 0.025)
-    );
-  font-size: 12px;
-  font-weight: 1000;
-  letter-spacing: 1px;
-}
-
-.player-portrait {
-  border-color: rgba(40, 215, 255, 0.5);
-  box-shadow: 0 0 14px rgba(40, 215, 255, 0.12);
-}
-
-.enemy-portrait {
-  border-color: rgba(255, 62, 85, 0.5);
-  box-shadow: 0 0 14px rgba(255, 62, 85, 0.12);
-}
-
-.fighter-name {
-  font-size: clamp(10px, 2vw, 14px);
-  font-weight: 1000;
-  letter-spacing: 1.5px;
-  white-space: nowrap;
-}
-
-.fighter-status {
-  margin-top: 2px;
-  color: var(--muted);
-  font-size: 7px;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
-
-/* =========================================================
-   HEALTH / VITALITY BARS
-   ========================================================= */
-
-.bars {
-  display: grid;
-  gap: 4px;
-  margin-top: 5px;
-}
-
-.bar-row {
-  display: grid;
-  grid-template-columns: 25px 1fr 30px;
-  align-items: center;
-  gap: 4px;
-}
-
-.enemy-hud .bar-row {
-  grid-template-columns: 30px 1fr 25px;
-}
-
-.bar-label,
-.bar-row > span:last-child {
-  font-size: 7px;
-  font-weight: 900;
-  color: var(--muted);
-}
-
-.bar-row > span:last-child {
-  text-align: right;
-}
-
-.enemy-hud .bar-row > span:first-child {
   text-align: left;
 }
 
-.bar {
-  position: relative;
-  height: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.8);
+.enemy-hud {
+  text-align: right;
 }
 
-.bar-fill {
-  height: 100%;
-  width: 0%;
-  transform-origin: left center;
-  transition: width 0.12s linear;
+.fighter-name {
+  margin-bottom: 7px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
 }
 
-.enemy-hud .bar-fill {
-  transform-origin: right center;
-}
-
-.health-fill {
-  background:
-    linear-gradient(
-      90deg,
-      #14aee0,
-      #54eaff
-    );
-  box-shadow:
-    0 0 9px rgba(40, 215, 255, 0.6);
-}
-
-.enemy-health-fill {
-  background:
-    linear-gradient(
-      90deg,
-      #ff6a78,
-      #ff304b
-    );
-  box-shadow:
-    0 0 9px rgba(255, 62, 85, 0.6);
-}
-
-.vitality-fill {
-  background:
-    linear-gradient(
-      90deg,
-      #7243d7,
-      #b184ff
-    );
-  box-shadow:
-    0 0 8px rgba(155, 101, 255, 0.55);
-}
-
-.enemy-vitality-fill {
-  background:
-    linear-gradient(
-      90deg,
-      #ff7d9a,
-      #b33bff
-    );
-  box-shadow:
-    0 0 8px rgba(255, 82, 155, 0.5);
-}
-
-/* =========================================================
-   THREE FURY BARS
-   ========================================================= */
-
-.fury-system {
+.bar-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-bottom: 5px;
 }
 
-.enemy-fury-system {
+.enemy-hud .bar-row {
+  justify-content: flex-end;
+}
+
+.bar-row > span {
+  width: 30px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.bar {
+  height: 12px;
+  flex: 1;
+  max-width: 430px;
+  min-width: 100px;
+  overflow: hidden;
+  background: #141b21;
+  border: 1px solid #38434b;
+}
+
+.health-bar {
+  transform: skewX(-12deg);
+}
+
+.health-bar .bar-fill {
+  height: 100%;
+  width: 100%;
+  background: #28d7ff;
+  box-shadow: 0 0 12px rgba(40, 215, 255, 0.7);
+  transition: width 0.18s ease;
+}
+
+.enemy-hud .health-bar .bar-fill {
+  background: #ff4057;
+  box-shadow: 0 0 12px rgba(255, 64, 87, 0.7);
+}
+
+.vitality-bar {
+  height: 6px;
+}
+
+.vitality-bar .bar-fill {
+  width: 100%;
+  height: 100%;
+  background: #b766ff;
+  transition: width 0.18s ease;
+}
+
+.round-hud {
+  text-align: center;
+  min-width: 90px;
+}
+
+.round-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  opacity: 0.7;
+}
+
+.timer {
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1;
+  margin-top: 3px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.3);
+}
+
+
+/* =================================
+   FURY
+   ================================= */
+
+.fury-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.enemy-fury-row {
   justify-content: flex-end;
 }
 
 .fury-label {
-  color: var(--muted);
-  font-size: 7px;
-  font-weight: 1000;
-  letter-spacing: 1px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  opacity: 0.65;
 }
 
 .fury-slots {
   display: flex;
-  gap: 3px;
+  gap: 4px;
 }
 
 .fury-slot {
+  width: 24px;
+  height: 7px;
   display: block;
-  width: clamp(18px, 5vw, 30px);
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid #4c5862;
+  background: #171d22;
+  transform: skewX(-18deg);
   transition:
     background 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 .fury-slot.active {
-  background: var(--fury);
-  box-shadow:
-    0 0 9px rgba(255, 189, 50, 0.85);
+  background: #28d7ff;
+  box-shadow: 0 0 10px rgba(40, 215, 255, 0.7);
+}
+
+.enemy-fury-row .fury-slot.active {
+  background: #ff4057;
+  box-shadow: 0 0 10px rgba(255, 64, 87, 0.7);
 }
 
 .fury-slot.ready {
-  animation: furyPulse 0.75s infinite alternate;
-}
-
-#playerFuryText,
-#enemyFuryText {
-  color: var(--fury);
-  font-size: 7px;
-  font-weight: 900;
-  white-space: nowrap;
+  animation: furyPulse 0.65s infinite alternate;
 }
 
 @keyframes furyPulse {
   from {
-    opacity: 0.6;
+    opacity: 0.65;
   }
 
   to {
     opacity: 1;
-    transform: scaleY(1.5);
+    transform: skewX(-18deg) scaleY(1.35);
   }
 }
 
-/* =========================================================
-   CENTER HUD
-   ========================================================= */
 
-.center-hud {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 2px;
-}
+/* =================================
+   CENTER MESSAGE
+   ================================= */
 
-.game-logo {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: clamp(9px, 2vw, 14px);
-  font-weight: 1000;
-  letter-spacing: 3px;
-  text-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.9);
-}
-
-.timer {
-  min-width: 54px;
-  margin-top: 4px;
-  text-align: center;
-  font-size: clamp(24px, 5vw, 38px);
-  line-height: 1;
-  font-weight: 1000;
-  letter-spacing: 1px;
-  text-shadow:
-    0 3px 12px rgba(0, 0, 0, 0.9);
-}
-
-.round-number {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 7px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.pause-button {
+.center-message {
   position: absolute;
-  top: 2px;
-  right: -42px;
-
-  width: 31px;
-  height: 31px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(8, 12, 16, 0.8);
-  pointer-events: auto;
-}
-
-.pause-button span {
-  width: 3px;
-  height: 11px;
-  border-radius: 2px;
-  background: white;
-}
-
-/* =========================================================
-   COMBAT MESSAGE
-   ========================================================= */
-
-.combat-message {
-  position: absolute;
-  top: 25%;
+  z-index: 30;
+  top: 40%;
   left: 50%;
-  z-index: 15;
-
-  width: 90%;
   transform: translate(-50%, -50%);
   text-align: center;
   pointer-events: none;
 }
 
-.message-title {
-  font-size: clamp(28px, 9vw, 72px);
-  line-height: 1;
+.message {
+  font-size: clamp(32px, 7vw, 80px);
   font-weight: 1000;
-  letter-spacing: 3px;
+  letter-spacing: 0.12em;
   text-shadow:
-    0 4px 0 rgba(0, 0, 0, 0.65),
-    0 8px 25px rgba(0, 0, 0, 0.75);
+    0 0 15px rgba(40, 215, 255, 0.6),
+    0 0 40px rgba(40, 215, 255, 0.25);
+  transition: opacity 0.25s ease;
 }
 
-.message-subtitle {
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 3px;
+.sub-message {
+  margin-top: 7px;
+  font-size: 12px;
+  letter-spacing: 0.45em;
+  opacity: 0.75;
+  transition: opacity 0.25s ease;
 }
 
-/* =========================================================
+
+/* =================================
    COMBO
-   ========================================================= */
+   ================================= */
 
 .combo-counter {
   position: absolute;
-  left: 8%;
-  top: 48%;
-  z-index: 15;
-
-  display: flex;
-  flex-direction: column;
-
+  z-index: 25;
+  left: 50%;
+  bottom: 26%;
+  transform: translateX(-50%) scale(0.8);
   opacity: 0;
-  transform: translateX(-25px) skewX(-8deg);
-
   pointer-events: none;
+  text-align: center;
   transition:
     opacity 0.18s ease,
     transform 0.18s ease;
@@ -566,167 +354,155 @@ button {
 
 .combo-counter.visible {
   opacity: 1;
-  transform: translateX(0) skewX(-8deg);
+  transform: translateX(-50%) scale(1);
 }
 
-.combo-number {
-  font-size: clamp(30px, 8vw, 64px);
+.combo-counter strong {
+  display: block;
+  font-size: 46px;
+  font-weight: 1000;
   line-height: 0.9;
-  font-weight: 1000;
-  text-shadow:
-    0 4px 15px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 0 18px rgba(255,255,255,0.5);
 }
 
-.combo-label {
-  color: var(--muted);
-  font-size: 8px;
-  font-weight: 1000;
-  letter-spacing: 3px;
+.combo-counter span {
+  font-size: 11px;
+  letter-spacing: 0.25em;
 }
 
-/* =========================================================
-   DAMAGE NUMBER
-   ========================================================= */
 
-.damage-number {
-  position: absolute;
-  z-index: 30;
-  opacity: 0;
-  pointer-events: none;
+/* =================================
+   DAMAGE
+   ================================= */
 
-  font-size: 28px;
-  font-weight: 1000;
-  text-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.9);
-
-  transform: translate(-50%, -50%);
-}
-
-.damage-number.show {
-  animation: damageFloat 0.7s ease-out forwards;
-}
-
-@keyframes damageFloat {
-  0% {
-    opacity: 0;
-    transform:
-      translate(-50%, -20%)
-      scale(0.7);
-  }
-
-  15% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform:
-      translate(-50%, -150%)
-      scale(1.2);
-  }
-}
-
-/* =========================================================
-   SCREEN EFFECTS
-   ========================================================= */
-
-.screen-effect {
+.damage-flash,
+.fury-flash {
   position: absolute;
   inset: 0;
-  z-index: 40;
-  opacity: 0;
+  z-index: 100;
   pointer-events: none;
+  opacity: 0;
 }
 
 .damage-flash {
-  background: rgba(255, 40, 60, 0.22);
+  background: rgba(255, 50, 50, 0.12);
 }
 
 .damage-flash.active {
-  animation: damageFlash 0.18s ease-out;
+  animation: damageFlash 0.18s ease;
 }
 
 .fury-flash {
-  background:
-    radial-gradient(
-      circle,
-      rgba(255, 190, 40, 0.3),
-      transparent 65%
-    );
+  background: rgba(40, 215, 255, 0.1);
 }
 
 .fury-flash.active {
-  animation: furyFlash 0.5s ease-out;
+  animation: furyFlash 0.5s ease;
 }
 
 @keyframes damageFlash {
-  0% {
-    opacity: 0;
-  }
-
-  35% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes furyFlash {
-  0% {
-    opacity: 0;
-  }
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
 
-  20% {
+.damage-number {
+  position: absolute;
+  z-index: 110;
+  transform: translate(-50%, -50%);
+  font-size: 34px;
+  font-weight: 1000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.damage-number.show {
+  animation: damageNumber 0.65s ease-out;
+}
+
+@keyframes damageNumber {
+  0% {
     opacity: 1;
+    transform: translate(-50%, -50%) scale(0.7);
   }
 
   100% {
     opacity: 0;
+    transform: translate(-50%, -100%) scale(1.2);
   }
 }
 
-/* =========================================================
-   JOYSTICK
-   ========================================================= */
+
+/* =================================
+   PAUSE
+   ================================= */
+
+.pause-button {
+  position: absolute;
+  z-index: 40;
+  top: 18px;
+  right: 18px;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid #65727c;
+  border-radius: 50%;
+
+  background: rgba(8, 12, 16, 0.8);
+
+  font-weight: 900;
+}
+
+.pause-button:active {
+  transform: scale(0.92);
+}
+
+
+/* =================================
+   MOBILE CONTROLS
+   ================================= */
+
+.mobile-controls {
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  right: 0;
+  bottom: 15px;
+
+  height: 180px;
+
+  pointer-events: none;
+}
 
 .joystick {
   position: absolute;
-  left: max(18px, env(safe-area-inset-left));
-  bottom: max(22px, env(safe-area-inset-bottom));
-  z-index: 50;
+  left: 25px;
+  bottom: 15px;
 
-  width: clamp(125px, 30vw, 185px);
-  height: clamp(125px, 30vw, 185px);
+  width: 125px;
+  height: 125px;
 
-  display: grid;
-  place-items: center;
-
-  pointer-events: auto;
-  touch-action: none;
-}
-
-.joystick-ring {
-  position: relative;
-
-  width: 100%;
-  height: 100%;
-
-  border: 2px solid rgba(255, 255, 255, 0.13);
   border-radius: 50%;
+
+  border: 2px solid rgba(255,255,255,0.2);
 
   background:
     radial-gradient(
       circle,
-      rgba(255, 255, 255, 0.07),
-      rgba(255, 255, 255, 0.015) 65%,
-      rgba(0, 0, 0, 0.15)
+      rgba(255,255,255,0.08),
+      rgba(255,255,255,0.025)
     );
 
   box-shadow:
-    inset 0 0 25px rgba(0, 0, 0, 0.45),
-    0 10px 30px rgba(0, 0, 0, 0.35);
+    inset 0 0 30px rgba(0,0,0,0.4),
+    0 0 20px rgba(0,0,0,0.35);
+
+  pointer-events: auto;
 }
 
 .joystick-knob {
@@ -734,505 +510,325 @@ button {
   left: 50%;
   top: 50%;
 
-  width: 48%;
-  height: 48%;
+  width: 58px;
+  height: 58px;
 
   transform: translate(-50%, -50%);
 
-  border: 2px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
 
   background:
     radial-gradient(
       circle at 35% 30%,
-      rgba(255, 255, 255, 0.28),
-      rgba(255, 255, 255, 0.05) 45%,
-      rgba(0, 0, 0, 0.25)
+      #56636d,
+      #202930
     );
 
+  border: 2px solid #77838b;
+
   box-shadow:
-    0 7px 15px rgba(0, 0, 0, 0.45),
-    inset 0 0 15px rgba(255, 255, 255, 0.08);
+    0 5px 15px rgba(0,0,0,0.5);
+}
+
+.action-buttons {
+  position: absolute;
+  right: 18px;
+  bottom: 12px;
+
+  width: 260px;
+  height: 155px;
 
   pointer-events: none;
-  will-change: transform;
 }
 
-.joystick-direction {
+.control-button {
   position: absolute;
-  color: rgba(255, 255, 255, 0.24);
-  font-size: 13px;
-  font-weight: 900;
-  pointer-events: none;
-}
 
-.joystick-direction.up {
-  left: 50%;
-  top: 10px;
-  transform: translateX(-50%);
-}
+  width: 58px;
+  height: 58px;
 
-.joystick-direction.down {
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%);
-}
-
-.joystick-direction.left {
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.joystick-direction.right {
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-/* =========================================================
-   ACTION BUTTONS
-   ========================================================= */
-
-.actions {
-  position: absolute;
-  right: max(14px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
-  z-index: 50;
-
-  width: min(46vw, 285px);
-
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(7px, 1.8vw, 12px);
-
-  pointer-events: auto;
-}
-
-.action-button {
-  position: relative;
-
-  min-width: 0;
-  aspect-ratio: 1 / 1;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
+
+  border: 2px solid rgba(255,255,255,0.22);
 
   background:
     radial-gradient(
-      circle at 35% 25%,
-      rgba(255, 255, 255, 0.15),
-      rgba(10, 14, 18, 0.9) 65%
+      circle at 35% 30%,
+      #39444c,
+      #171d22
     );
 
   box-shadow:
-    0 7px 15px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 6px 14px rgba(0,0,0,0.4),
+    inset 0 0 10px rgba(255,255,255,0.05);
 
-  transition:
-    transform 0.08s ease,
-    filter 0.08s ease,
-    border-color 0.08s ease;
-
-  touch-action: manipulation;
-}
-
-.action-button strong {
-  font-size: clamp(18px, 5vw, 28px);
-  line-height: 1;
-}
-
-.action-button span {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: clamp(6px, 1.6vw, 9px);
+  font-size: 16px;
   font-weight: 1000;
-  letter-spacing: 0.7px;
+
+  pointer-events: auto;
+
+  user-select: none;
+  touch-action: none;
 }
 
-.action-button:active,
-.action-button.pressed {
-  transform: scale(0.9);
-  filter: brightness(1.35);
+.control-button.pressed,
+.control-button:active {
+  transform: scale(0.88);
+  background: #45535d;
 }
 
-.punch-button {
-  border-color: rgba(40, 215, 255, 0.35);
+.jump {
+  top: 0;
+  right: 72px;
 }
 
-.kick-button {
-  border-color: rgba(255, 105, 60, 0.35);
+.dash {
+  top: 47px;
+  right: 137px;
 }
 
-.block-button {
-  border-color: rgba(155, 101, 255, 0.35);
+.punch {
+  top: 60px;
+  right: 68px;
 }
 
-.fury-button {
-  border-color: rgba(255, 189, 50, 0.55);
+.kick {
+  top: 17px;
+  right: 0;
+}
+
+.block {
+  top: 82px;
+  right: 0;
+}
+
+.fury {
+  top: 94px;
+  right: 137px;
+  width: 72px;
+  height: 48px;
+  border-radius: 25px;
+  font-size: 10px;
+}
+
+.fury.ready {
+  border-color: #28d7ff;
   box-shadow:
-    0 0 15px rgba(255, 189, 50, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.fury-button.ready {
-  animation: furyButtonPulse 0.75s infinite alternate;
+    0 0 15px rgba(40,215,255,0.6),
+    inset 0 0 12px rgba(40,215,255,0.15);
+  animation: furyButtonPulse 0.7s infinite alternate;
 }
 
 @keyframes furyButtonPulse {
   from {
-    box-shadow:
-      0 0 8px rgba(255, 189, 50, 0.2);
+    filter: brightness(1);
   }
 
   to {
-    box-shadow:
-      0 0 25px rgba(255, 189, 50, 0.65);
+    filter: brightness(1.45);
   }
 }
 
-/* =========================================================
-   MODALS
-   ========================================================= */
 
-.modal-overlay {
+/* =================================
+   OVERLAYS
+   ================================= */
+
+.overlay {
   position: absolute;
+  z-index: 200;
   inset: 0;
-  z-index: 100;
 
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 24px;
-
-  background:
-    rgba(0, 0, 0, 0.72);
+  background: rgba(0,0,0,0.7);
 
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  opacity: 1;
-  visibility: visible;
-
-  transition:
-    opacity 0.2s ease,
-    visibility 0.2s ease;
 }
 
-.modal-overlay.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
+.overlay-box {
+  width: min(440px, 88vw);
 
-.modal-card {
-  width: min(88vw, 420px);
-
-  padding: 28px 22px;
+  padding: 35px;
 
   text-align: center;
 
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 20px;
+  border: 1px solid #394851;
 
   background:
     linear-gradient(
       145deg,
-      rgba(30, 38, 46, 0.96),
-      rgba(7, 10, 13, 0.97)
+      rgba(20,30,38,0.97),
+      rgba(5,8,11,0.97)
     );
 
   box-shadow:
-    0 25px 70px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-
-  transform: translateY(0);
+    0 20px 60px rgba(0,0,0,0.6);
 }
 
-.modal-icon {
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 15px;
-
-  display: grid;
-  place-items: center;
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 15px;
-
-  font-size: 20px;
-  font-weight: 1000;
+.overlay-box h1 {
+  font-size: clamp(36px, 9vw, 70px);
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
 }
 
-.modal-card h2 {
-  font-size: clamp(25px, 7vw, 40px);
-  font-weight: 1000;
-  letter-spacing: 2px;
+.overlay-box p {
+  opacity: 0.7;
+  margin-bottom: 25px;
+  letter-spacing: 0.12em;
 }
 
-.modal-card p {
-  margin-top: 7px;
-  color: var(--muted);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
-
-.modal-button {
+.overlay-box button {
+  display: block;
   width: 100%;
-  min-height: 48px;
-  margin-top: 20px;
+  margin-top: 10px;
+  padding: 14px;
 
-  border: 1px solid rgba(40, 215, 255, 0.45);
-  border-radius: 11px;
+  background: #18232b;
 
-  background:
-    linear-gradient(
-      135deg,
-      rgba(40, 215, 255, 0.2),
-      rgba(40, 215, 255, 0.05)
-    );
+  border: 1px solid #52626d;
 
-  font-size: 12px;
-  font-weight: 1000;
-  letter-spacing: 2px;
-
-  transition:
-    transform 0.1s ease,
-    filter 0.1s ease;
+  font-weight: 900;
+  letter-spacing: 0.12em;
 }
 
-.modal-button:active {
-  transform: scale(0.97);
-  filter: brightness(1.3);
+.overlay-box button:hover {
+  background: #25343e;
 }
 
-.modal-button.secondary {
-  margin-top: 9px;
-  border-color: var(--line);
-  background: rgba(255, 255, 255, 0.05);
+.finish-box {
+  border-color: #28d7ff;
+  box-shadow:
+    0 0 50px rgba(40,215,255,0.18),
+    0 20px 60px rgba(0,0,0,0.6);
 }
-
-.fury-modal-button {
-  border-color: rgba(255, 189, 50, 0.7);
-  color: var(--fury);
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255, 189, 50, 0.22),
-      rgba(255, 80, 30, 0.06)
-    );
-}
-
-/* =========================================================
-   RESULT STATS
-   ========================================================= */
 
 .result-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 22px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.result-stat {
-  padding: 11px 5px;
-
-  border: 1px solid var(--line);
-  border-radius: 10px;
-
-  background: rgba(255, 255, 255, 0.035);
+.result-stats div {
+  padding: 12px 5px;
+  background: rgba(255,255,255,0.04);
 }
 
-.result-stat strong {
+.result-stats span {
   display: block;
-  font-size: 20px;
-  font-weight: 1000;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
 }
 
-.result-stat span {
+.result-stats strong {
   display: block;
-  margin-top: 3px;
-  color: var(--muted);
-  font-size: 6px;
-  font-weight: 900;
-  letter-spacing: 0.8px;
+  margin-top: 5px;
+  font-size: 22px;
 }
 
-/* =========================================================
-   ACCESSIBILITY
-   ========================================================= */
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* =================================
+   SMALL SCREENS
+   ================================= */
 
-/* =========================================================
-   LANDSCAPE PHONE
-   ========================================================= */
-
-@media (orientation: landscape) and (max-height: 600px) {
+@media (max-width: 650px) {
 
   .hud {
-    padding-top: 6px;
-  }
-
-  .portrait {
-    width: 30px;
-    height: 30px;
-    flex-basis: 30px;
-  }
-
-  .fighter-info {
-    min-height: 30px;
-  }
-
-  .bars {
-    margin-top: 3px;
-    gap: 2px;
-  }
-
-  .bar {
-    height: 6px;
-  }
-
-  .fury-system {
-    margin-top: 3px;
-  }
-
-  .joystick {
-    width: min(23vh, 145px);
-    height: min(23vh, 145px);
-    bottom: 12px;
-  }
-
-  .actions {
-    width: min(38vw, 260px);
-    bottom: 10px;
-  }
-
-  .action-button {
-    gap: 1px;
-  }
-
-  .action-button strong {
-    font-size: min(5vh, 24px);
-  }
-
-  .combat-message {
-    top: 35%;
-  }
-
-  .combo-counter {
-    top: 52%;
-  }
-}
-
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 380px) {
-
-  .hud {
-    grid-template-columns:
-      minmax(0, 1fr)
-      75px
-      minmax(0, 1fr);
-
-    gap: 5px;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 7px;
   }
 
   .fighter-name {
+    font-size: 9px;
+  }
+
+  .bar {
+    min-width: 55px;
+    height: 9px;
+  }
+
+  .bar-row > span {
+    width: 20px;
     font-size: 8px;
   }
 
-  .fighter-status {
-    font-size: 6px;
-  }
-
-  .portrait {
-    width: 30px;
-    height: 30px;
-    flex-basis: 30px;
-  }
-
-  .bar-row {
-    grid-template-columns: 20px 1fr 23px;
-  }
-
-  .enemy-hud .bar-row {
-    grid-template-columns: 23px 1fr 20px;
-  }
-
-  .game-logo {
-    font-size: 7px;
-    letter-spacing: 2px;
+  .round-hud {
+    min-width: 50px;
   }
 
   .timer {
     font-size: 25px;
   }
 
-  .actions {
-    width: 49vw;
-    gap: 5px;
+  .round-label {
+    font-size: 7px;
+  }
+
+  .fury-slot {
+    width: 15px;
+    height: 5px;
+  }
+
+  .fury-label {
+    display: none;
   }
 
   .joystick {
-    width: 115px;
-    height: 115px;
+    width: 105px;
+    height: 105px;
+    left: 15px;
   }
+
+  .joystick-knob {
+    width: 50px;
+    height: 50px;
+  }
+
+  .action-buttons {
+    right: 8px;
+    transform: scale(0.82);
+    transform-origin: right bottom;
+  }
+
+  .mobile-controls {
+    bottom: 5px;
+  }
+
+  .combo-counter {
+    bottom: 31%;
+  }
+
 }
 
-/* =========================================================
-   VERY TALL / VERY WIDE DEVICES
-   ========================================================= */
+@media (orientation: landscape) and (max-height: 500px) {
 
-@media (min-width: 900px) {
+  .mobile-controls {
+    height: 145px;
+  }
 
   .joystick {
-    width: 170px;
-    height: 170px;
+    width: 95px;
+    height: 95px;
   }
 
-  .actions {
-    width: 300px;
+  .joystick-knob {
+    width: 46px;
+    height: 46px;
   }
 
-  .action-button strong {
-    font-size: 29px;
+  .action-buttons {
+    transform: scale(0.72);
+    transform-origin: right bottom;
   }
 
-  .action-button span {
-    font-size: 9px;
+  .hud {
+    top: 7px;
   }
-}
 
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
 }
