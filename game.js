@@ -616,132 +616,54 @@ class Fighter {
 
     scene.add(
       this.group
-    );
+    )
 
-  }
-
-
-  /* ========================================================
-     MODEL
-     ======================================================== */
-/* ========================================================
-   UPGRADED IRON FURY FIGHTER MODEL
-   Kai = athletic martial artist
-   Rocco = heavy muscular grappler
-   ======================================================== */
-
+    
 createModel() {
 
-  /* ------------------------------------------------------
-     MATERIALS
-     ------------------------------------------------------ */
+  const skin = mat(0xc88968);
+  const suit = mat(this.color, 0.35);
+  const accent = mat(this.accent, 0.5);
+  const dark = mat(0x11161b, 0.4);
 
-  const skin = mat(0xc88968, 0.05);
-
-  const skinDark = mat(0x8f553f, 0.05);
-
-  const suit = mat(this.color, 0.32);
-
-  const accent = mat(this.accent, 0.45);
-
-  const dark = mat(0x101419, 0.5);
-
-  const belt = mat(
-    this.playerControlled
-      ? 0x111111
-      : 0x180d0d,
-    0.25
-  );
-
-  const glove = mat(
-    this.playerControlled
-      ? 0x11161b
-      : 0x161616,
-    0.4
-  );
-
-  const red = mat(0x8f1828, 0.3);
-
-  /* ------------------------------------------------------
-     MAIN GROUP
-     ------------------------------------------------------ */
+  /* BODY */
 
   this.body = new THREE.Group();
-
   this.group.add(this.body);
 
 
-  /* ------------------------------------------------------
-     TORSO
-     ------------------------------------------------------ */
+  /* TORSO */
 
   this.torso = new THREE.Mesh(
-
     new THREE.BoxGeometry(
-      this.playerControlled ? 1.15 : 1.35,
-      this.playerControlled ? 1.45 : 1.55,
-      0.68
+      1.05,
+      1.45,
+      0.58
     ),
-
     suit
-
   );
 
-  this.torso.position.y = 2.65;
-
+  this.torso.position.y = 2.55;
   this.torso.castShadow = true;
 
   this.body.add(this.torso);
 
 
-  /* ------------------------------------------------------
-     SHOULDERS
-     ------------------------------------------------------ */
-
-  const shoulderWidth =
-    this.playerControlled
-      ? 0.72
-      : 0.9;
-
-  this.shoulders = new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-      shoulderWidth * 2,
-      0.35,
-      0.72
-    ),
-
-    suit
-
-  );
-
-  this.shoulders.position.y = 3.15;
-
-  this.shoulders.castShadow = true;
-
-  this.body.add(this.shoulders);
-
-
-  /* ------------------------------------------------------
-     CHEST
-     ------------------------------------------------------ */
+  /* CHEST ARMOR */
 
   const chest = new THREE.Mesh(
-
     new THREE.BoxGeometry(
-      this.playerControlled ? 0.8 : 1.0,
-      0.48,
-      0.74
+      0.72,
+      0.42,
+      0.64
     ),
-
     accent
-
   );
 
   chest.position.set(
     0,
-    2.82,
-    0.34
+    2.78,
+    0.3
   );
 
   chest.castShadow = true;
@@ -749,244 +671,69 @@ createModel() {
   this.body.add(chest);
 
 
-  /* ------------------------------------------------------
-     CHEST STRAP / GI COLLAR
-     ------------------------------------------------------ */
-
-  if (this.playerControlled) {
-
-    const collar = new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        0.18,
-        0.95,
-        0.06
-      ),
-
-      dark
-
-    );
-
-    collar.position.set(
-      0,
-      2.9,
-      0.39
-    );
-
-    collar.rotation.z =
-      Math.PI * 0.15;
-
-    this.body.add(collar);
-
-  } else {
-
-    /* Rocco chest armor */
-
-    const armor = new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        0.9,
-        0.75,
-        0.08
-      ),
-
-      dark
-
-    );
-
-    armor.position.set(
-      0,
-      2.8,
-      0.39
-    );
-
-    this.body.add(armor);
-
-  }
-
-
-  /* ------------------------------------------------------
-     HEAD
-     ------------------------------------------------------ */
+  /* HEAD */
 
   this.head = new THREE.Mesh(
-
     new THREE.SphereGeometry(
-      this.playerControlled
-        ? 0.42
-        : 0.48,
-      18,
-      14
+      0.42,
+      16,
+      12
     ),
-
     skin
-
   );
 
-  this.head.position.y =
-    this.playerControlled
-      ? 3.88
-      : 3.98;
-
-  this.head.scale.set(
-    1,
-    1.08,
-    0.92
-  );
-
+  this.head.position.y = 3.75;
   this.head.castShadow = true;
 
   this.body.add(this.head);
 
 
-  /* ------------------------------------------------------
-     HAIR
-     ------------------------------------------------------ */
+  /* VISOR */
 
-  if (this.playerControlled) {
-
-    const hair = new THREE.Mesh(
-
-      new THREE.SphereGeometry(
-        0.43,
-        14,
-        8
-      ),
-
-      dark
-
-    );
-
-    hair.scale.set(
-      1.02,
-      0.48,
-      1
-    );
-
-    hair.position.set(
-      0,
-      4.15,
-      -0.02
-    );
-
-    this.body.add(hair);
-
-  } else {
-
-    /* Rocco bald head + beard */
-
-    const beard = new THREE.Mesh(
-
-      new THREE.SphereGeometry(
-        0.28,
-        12,
-        8
-      ),
-
-      skinDark
-
-    );
-
-    beard.scale.set(
-      0.8,
-      0.65,
-      0.65
-    );
-
-    beard.position.set(
-      0,
-      3.72,
-      0.3
-    );
-
-    this.body.add(beard);
-
-  }
-
-
-  /* ------------------------------------------------------
-     FACE / VISOR
-     ------------------------------------------------------ */
-
-  const face = new THREE.Mesh(
-
+  const visor = new THREE.Mesh(
     new THREE.BoxGeometry(
       0.55,
-      0.12,
-      0.06
+      0.14,
+      0.08
     ),
-
     dark
-
   );
 
-  face.position.set(
+  visor.position.set(
     0,
-    this.playerControlled
-      ? 3.92
-      : 4.02,
-    0.42
+    3.77,
+    0.39
   );
 
-  this.body.add(face);
+  this.body.add(visor);
 
 
-  /* ------------------------------------------------------
-     NECK
-     ------------------------------------------------------ */
+  /* LEFT ARM */
 
-  const neck = new THREE.Mesh(
-
-    new THREE.CylinderGeometry(
-      this.playerControlled
-        ? 0.19
-        : 0.25,
-      this.playerControlled
-        ? 0.22
-        : 0.29,
-      0.32,
-      10
-    ),
-
-    skin
-
+  this.leftArm = this.limb(
+    0.19,
+    0.78,
+    suit
   );
-
-  neck.position.y = 3.45;
-
-  neck.castShadow = true;
-
-  this.body.add(neck);
-
-
-  /* ------------------------------------------------------
-     ARMS
-     ------------------------------------------------------ */
-
-  this.leftArm = this.createArm(
-    suit,
-    glove,
-    skin,
-    -1
-  );
-
-  this.rightArm = this.createArm(
-    suit,
-    glove,
-    skin,
-    1
-  );
-
 
   this.leftArm.position.set(
-    -shoulderWidth,
-    3.05,
+    -0.68,
+    3.02,
     0
   );
 
+
+  /* RIGHT ARM */
+
+  this.rightArm = this.limb(
+    0.19,
+    0.78,
+    suit
+  );
+
   this.rightArm.position.set(
-    shoulderWidth,
-    3.05,
+    0.68,
+    3.02,
     0
   );
 
@@ -996,37 +743,68 @@ createModel() {
   );
 
 
-  /* ------------------------------------------------------
-     LEGS
-     ------------------------------------------------------ */
+  /* LEFT FIST */
 
-  const legMaterial =
-    this.playerControlled
-      ? suit
-      : dark;
+  this.leftFist = new THREE.Mesh(
+    new THREE.SphereGeometry(
+      0.2,
+      10,
+      8
+    ),
+    accent
+  );
 
-  this.leftLeg =
-    this.createLeg(
-      legMaterial,
-      skin
-    );
+  this.leftFist.position.y = -0.5;
 
-  this.rightLeg =
-    this.createLeg(
-      legMaterial,
-      skin
-    );
+  this.leftArm.add(
+    this.leftFist
+  );
 
+
+  /* RIGHT FIST */
+
+  this.rightFist = new THREE.Mesh(
+    new THREE.SphereGeometry(
+      0.2,
+      10,
+      8
+    ),
+    accent
+  );
+
+  this.rightFist.position.y = -0.5;
+
+  this.rightArm.add(
+    this.rightFist
+  );
+
+
+  /* LEFT LEG */
+
+  this.leftLeg = this.limb(
+    0.25,
+    1.0,
+    dark
+  );
 
   this.leftLeg.position.set(
-    -0.32,
-    1.65,
+    -0.3,
+    1.3,
     0
   );
 
+
+  /* RIGHT LEG */
+
+  this.rightLeg = this.limb(
+    0.25,
+    1.0,
+    dark
+  );
+
   this.rightLeg.position.set(
-    0.32,
-    1.65,
+    0.3,
+    1.3,
     0
   );
 
@@ -1036,722 +814,63 @@ createModel() {
   );
 
 
-  /* ------------------------------------------------------
-     BELT
-     ------------------------------------------------------ */
+  /* LEFT FOOT */
 
-  this.belt = new THREE.Mesh(
-
+  this.leftFoot = new THREE.Mesh(
     new THREE.BoxGeometry(
-      this.playerControlled
-        ? 1.2
-        : 1.45,
-      0.25,
-      0.74
+      0.34,
+      0.2,
+      0.58
     ),
-
-    belt
-
+    dark
   );
 
-  this.belt.position.y = 1.98;
+  this.leftFoot.position.set(
+    0,
+    -0.58,
+    0.15
+  );
 
-  this.belt.castShadow = true;
-
-  this.body.add(this.belt);
-
-
-  /* ------------------------------------------------------
-     KAI GI BELT STRAPS
-     ------------------------------------------------------ */
-
-  if (this.playerControlled) {
-
-    this.beltTail1 = new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        0.12,
-        0.65,
-        0.08
-      ),
-
-      belt
-
-    );
-
-    this.beltTail1.position.set(
-      -0.12,
-      1.65,
-      0.4
-    );
-
-    this.beltTail1.rotation.z = -0.15;
-
-    this.body.add(this.beltTail1);
+  this.leftLeg.add(
+    this.leftFoot
+  );
 
 
-    this.beltTail2 =
-      this.beltTail1.clone();
+  /* RIGHT FOOT */
 
-    this.beltTail2.position.x =
-      0.12;
+  this.rightFoot = new THREE.Mesh(
+    new THREE.BoxGeometry(
+      0.34,
+      0.2,
+      0.58
+    ),
+    dark
+  );
 
-    this.beltTail2.rotation.z =
-      0.15;
+  this.rightFoot.position.set(
+    0,
+    -0.58,
+    0.15
+  );
 
-    this.body.add(this.beltTail2);
+  this.rightLeg.add(
+    this.rightFoot
+  );
 
-  }
 
-
-  /* ------------------------------------------------------
-     Rocco RED ARM / LEG ACCENTS
-     ------------------------------------------------------ */
-
-  if (!this.playerControlled) {
-
-    const redChest = new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        0.95,
-        0.12,
-        0.1
-      ),
-
-      red
-
-    );
-
-    redChest.position.set(
-      0,
-      2.45,
-      0.4
-    );
-
-    this.body.add(redChest);
-
-  }
-
+  /* INITIAL POSE */
 
   this.resetPose();
 
 }
+    
 
-
-/* ========================================================
-   ARM CREATOR
-   ======================================================== */
-
-createArm(
-  suit,
-  glove,
-  skin,
-  side
-) {
-
-  const arm =
-    new THREE.Group();
-
-  const upperArm =
-    new THREE.Mesh(
-
-      new THREE.CylinderGeometry(
-        this.playerControlled
-          ? 0.17
-          : 0.25,
-        this.playerControlled
-          ? 0.19
-          : 0.27,
-        this.playerControlled
-          ? 0.7
-          : 0.82,
-        10
-      ),
-
-      suit
-
-    );
-
-  upperArm.position.y =
-    -0.34;
-
-  upperArm.castShadow = true;
-
-  arm.add(upperArm);
-
-
-  /* FOREARM */
-
-  const forearm =
-    new THREE.Mesh(
-
-      new THREE.CylinderGeometry(
-        this.playerControlled
-          ? 0.16
-          : 0.24,
-        this.playerControlled
-          ? 0.18
-          : 0.26,
-        this.playerControlled
-          ? 0.62
-          : 0.72,
-        10
-      ),
-
-      this.playerControlled
-        ? suit
-        : skin
-
-    );
-
-  forearm.position.y =
-    -0.9;
-
-  forearm.castShadow = true;
-
-  arm.add(forearm);
-
-
-  /* GLOVE */
-
-  const fist =
-    new THREE.Mesh(
-
-      new THREE.SphereGeometry(
-        this.playerControlled
-          ? 0.20
-          : 0.27,
-        12,
-        10
-      ),
-
-      glove
-
-    );
-
-  fist.position.y =
-    -1.32;
-
-  fist.scale.set(
-    1,
-    0.9,
-    0.85
-  );
-
-  fist.castShadow = true;
-
-  arm.add(fist);
-
-
-  return arm;
-
-}
-
-
-/* ========================================================
-   LEG CREATOR
-   ======================================================== */
-
-createLeg(
-  material,
-  skin
-) {
-
-  const leg =
-    new THREE.Group();
-
-
-  const thigh =
-    new THREE.Mesh(
-
-      new THREE.CylinderGeometry(
-        this.playerControlled
-          ? 0.23
-          : 0.31,
-        this.playerControlled
-          ? 0.25
-          : 0.34,
-        this.playerControlled
-          ? 0.85
-          : 1.0,
-        10
-      ),
-
-      material
-
-    );
-
-  thigh.position.y =
-    -0.42;
-
-  thigh.castShadow = true;
-
-  leg.add(thigh);
-
-
-  const shin =
-    new THREE.Mesh(
-
-      new THREE.CylinderGeometry(
-        this.playerControlled
-          ? 0.19
-          : 0.27,
-        this.playerControlled
-          ? 0.21
-          : 0.29,
-        this.playerControlled
-          ? 0.85
-          : 0.95,
-        10
-      ),
-
-      this.playerControlled
-        ? skin
-        : material
-
-    );
-
-  shin.position.y =
-    -1.2;
-
-  shin.castShadow = true;
-
-  leg.add(shin);
-
-
-  /* FOOT */
-
-  const foot =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        this.playerControlled
-          ? 0.38
-          : 0.48,
-        0.22,
-        this.playerControlled
-          ? 0.62
-          : 0.76
-      ),
-
-      this.playerControlled
-        ? skin
-        : mat(0x101010, 0.45)
-
-    );
-
-  foot.position.set(
-    0,
-    -1.73,
-    0.16
-  );
-
-  foot.castShadow = true;
-
-  leg.add(foot);
-
-
-  return leg;
-
-}
-
-
-/* ========================================================
-   RESET POSE
-   ======================================================== */
-
-resetPose() {
-
-  /* Arms */
-
-  this.leftArm.rotation.set(
-    0.15,
-    0,
-    0.22
-  );
-
-  this.rightArm.rotation.set(
-    0.15,
-    0,
-    -0.22
-  );
-
-
-  /* Legs */
-
-  this.leftLeg.rotation.set(
-    0,
-    0,
-    0
-  );
-
-  this.rightLeg.rotation.set(
-    0,
-    0,
-    0
-  );
-
-
-  /* Body */
-
-  this.body.rotation.set(
-    0,
-    0,
-    0
-  );
-
-  this.body.scale.set(
-    1,
-    1,
-    1
-  );
-
-
-  /* Torso */
-
-  if (this.torso) {
-
-    this.torso.rotation.set(
-      0,
-      0,
-      0
-    );
-
-  }
-
-}
-
-
-/* ========================================================
-   UPGRADED FIGHTING ANIMATION
-   ======================================================== */
-
-animate() {
-
-  const now =
-    performance.now() * 0.001;
-
-  const idle =
-    Math.sin(now * 3);
-
-
-  /* ------------------------------------------------------
-     BLOCK
-     ------------------------------------------------------ */
-
-  if (this.blocking) {
-
-    this.leftArm.rotation.x =
-      -1.25;
-
-    this.rightArm.rotation.x =
-      -1.25;
-
-    this.leftArm.rotation.z =
-      0.65;
-
-    this.rightArm.rotation.z =
-      -0.65;
-
-    this.body.rotation.z =
-      Math.sin(now * 5) * 0.025;
-
-    return;
-
-  }
-
-
-  /* ------------------------------------------------------
-     ATTACK
-     ------------------------------------------------------ */
-
-  if (this.attacking) {
-
-    const duration =
-      this.attack === "punch"
-        ? 0.42
-        : this.attack === "kick"
-          ? 0.55
-          : 1.15;
-
-    const progress =
-      THREE.MathUtils.clamp(
-        1 -
-        this.attackTime /
-        duration,
-        0,
-        1
-      );
-
-
-    /* Smooth attack curve */
-
-    const attackCurve =
-      Math.sin(
-        progress *
-        Math.PI
-      );
-
-
-    /* --------------------------------------------------
-       PUNCH
-       -------------------------------------------------- */
-
-    if (
-      this.attack === "punch"
-    ) {
-
-      const arm =
-        this.facing === 1
-          ? this.rightArm
-          : this.leftArm;
-
-      const other =
-        this.facing === 1
-          ? this.leftArm
-          : this.rightArm;
-
-
-      arm.rotation.x =
-        -2.25 *
-        attackCurve;
-
-      arm.rotation.z =
-        -0.18 *
-        this.facing *
-        attackCurve;
-
-
-      other.rotation.x =
-        -0.65 *
-        attackCurve;
-
-
-      this.body.rotation.y =
-        0.18 *
-        this.facing *
-        attackCurve;
-
-
-      this.body.rotation.z =
-        -0.05 *
-        attackCurve;
-
-    }
-
-
-    /* --------------------------------------------------
-       KICK
-       -------------------------------------------------- */
-
-    if (
-      this.attack === "kick"
-    ) {
-
-      const leg =
-        this.facing === 1
-          ? this.rightLeg
-          : this.leftLeg;
-
-      const other =
-        this.facing === 1
-          ? this.leftLeg
-          : this.rightLeg;
-
-
-      leg.rotation.x =
-        -1.85 *
-        attackCurve;
-
-
-      leg.rotation.z =
-        0.18 *
-        this.facing *
-        attackCurve;
-
-
-      other.rotation.x =
-        0.2 *
-        attackCurve;
-
-
-      this.body.rotation.y =
-        -0.15 *
-        this.facing *
-        attackCurve;
-
-
-      this.body.rotation.z =
-        0.06 *
-        attackCurve;
-
-    }
-
-
-    /* --------------------------------------------------
-       FURY
-       -------------------------------------------------- */
-
-    if (
-      this.attack === "fury"
-    ) {
-
-      const pulse =
-        1 +
-        Math.sin(now * 15) *
-        0.045;
-
-
-      this.body.scale.set(
-        pulse,
-        pulse,
-        pulse
-      );
-
-
-      this.leftArm.rotation.x =
-        -1.65;
-
-      this.rightArm.rotation.x =
-        -1.65;
-
-
-      this.leftArm.rotation.z =
-        0.4;
-
-      this.rightArm.rotation.z =
-        -0.4;
-
-
-      this.leftLeg.rotation.x =
-        -0.3;
-
-      this.rightLeg.rotation.x =
-        0.3;
-
-
-      this.body.rotation.y =
-        Math.sin(now * 10) *
-        0.08;
-
-      return;
-
-    }
-
-
-    return;
-
-  }
-
-
-  /* ------------------------------------------------------
-     JUMP
-     ------------------------------------------------------ */
-
-  if (!this.grounded) {
-
-    this.leftLeg.rotation.x =
-      -0.5;
-
-    this.rightLeg.rotation.x =
-      0.5;
-
-
-    this.leftArm.rotation.x =
-      -0.4;
-
-    this.rightArm.rotation.x =
-      -0.4;
-
-
-    this.body.rotation.z =
-      0;
-
-    return;
-
-  }
-
-
-  /* ------------------------------------------------------
-     IDLE / FIGHTING STANCE
-     ------------------------------------------------------ */
-
-  this.leftArm.rotation.x =
-    0.15 +
-    idle * 0.06;
-
-  this.rightArm.rotation.x =
-    0.15 -
-    idle * 0.06;
-
-
-  this.leftArm.rotation.z =
-    0.22;
-
-  this.rightArm.rotation.z =
-    -0.22;
-
-
-  this.leftLeg.rotation.x =
-    -idle * 0.025;
-
-  this.rightLeg.rotation.x =
-    idle * 0.025;
-
-
-  /* Breathing */
-
-  const breathing =
-    1 +
-    Math.sin(now * 2.2) *
-    0.012;
-
-  this.body.scale.y =
-    breathing;
-
-}
-
-
-/* ========================================================
-   HIT REACTION
-   ======================================================== */
-
-animateHit() {
-
-  const reaction =
-    Math.sin(
-      performance.now() *
-      0.035
-    );
-
-
-  this.body.rotation.z =
-    0.18 *
-    this.facing;
-
-
-  this.body.rotation.y =
-    -0.12 *
-    this.facing;
-
-
-  this.leftArm.rotation.z =
-    0.5;
-
-  this.rightArm.rotation.z =
-    -0.5;
-
-
-  this.leftArm.rotation.x =
-    0.5 +
-    reaction * 0.15;
-
-  this.rightArm.rotation.x =
-    0.5 -
-    reaction * 0.15;
-
-}
   
+
+  
+
+  
+        
     
         
 
