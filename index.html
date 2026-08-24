@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+re<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -481,12 +481,58 @@
   <!-- IMPORTANT:
        Three.js is loaded BEFORE game.js.
        game.js is loaded as a normal script. -->
+<script>
+(function () {
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
-  ></script>
+  const threeSources = [
+    "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js",
+    "https://unpkg.com/three@0.160.0/build/three.min.js"
+  ];
 
-  <script src="game.js"></script>
+  function loadThree(index) {
 
-</body>
-</html>
+    const script = document.createElement("script");
+    script.src = threeSources[index];
+
+    script.onload = function () {
+
+      console.log("Three.js loaded successfully.");
+
+      const gameScript = document.createElement("script");
+      gameScript.src = "game.js";
+
+      gameScript.onload = function () {
+        console.log("Iron Fury game.js loaded.");
+      };
+
+      gameScript.onerror = function () {
+        document.body.innerHTML =
+          "<div style='color:white;background:#05080b;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;font-family:Arial;padding:30px'>" +
+          "<div><h1>IRON FURY ERROR</h1><p>game.js could not be loaded.</p></div>" +
+          "</div>";
+      };
+
+      document.body.appendChild(gameScript);
+    };
+
+    script.onerror = function () {
+
+      if (index + 1 < threeSources.length) {
+        loadThree(index + 1);
+      } else {
+        document.body.innerHTML =
+          "<div style='color:white;background:#05080b;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;font-family:Arial;padding:30px'>" +
+          "<div><h1>IRON FURY ERROR</h1><p>Three.js could not be loaded.</p><p>Check your internet connection and refresh.</p></div>" +
+          "</div>";
+      }
+
+    };
+
+    document.head.appendChild(script);
+  }
+
+  loadThree(0);
+
+})();
+</script>
+
