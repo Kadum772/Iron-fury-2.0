@@ -11,7 +11,7 @@ window.addEventListener("load", function () {
 
     console.log("IRON FURY: page loaded");
 
-    try {
+    try {console.log("IRON FURY: entered initialization");
 
         // ----------------------------------------
         // GET HTML ELEMENTS
