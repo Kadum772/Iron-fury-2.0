@@ -1,4 +1,4 @@
-re<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -477,7 +477,16 @@ re<!DOCTYPE html>
 
   </main>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="game.js"></script>
-  </body>
+
+  <!-- IMPORTANT:
+       Three.js is loaded BEFORE game.js.
+       game.js is loaded as a normal script. -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
+  ></script>
+
+  <script src="game.js"></script>
+
+</body>
 </html>
