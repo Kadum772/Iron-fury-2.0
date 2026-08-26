@@ -1,169 +1,268 @@
+Iron Fury — index.html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#05080c">
 
-  <title>IRON FURY</title>
+  <title>Iron Fury 3D</title>
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- GAME -->
-  <canvas id="gameCanvas"></canvas>
-
   <!-- LOADING -->
-  <div id="loadingScreen">
-    <div class="loadingBox">
+  <div id="loadingScreen" class="overlay">
+    <div class="loader-card">
       <div class="logo">IRON FURY</div>
-      <div id="loadingText">INITIALIZING</div>
-      <div class="loadingBar">
+
+      <div id="loadingText">
+        INITIALIZING ENGINE
+      </div>
+
+      <div class="progress">
         <div id="loadingProgress"></div>
       </div>
     </div>
   </div>
 
+
+  <!-- 3D GAME -->
+  <canvas id="gameCanvas"></canvas>
+
+
   <!-- HUD -->
   <div id="hud">
 
-    <div class="fighterHud playerHud">
-      <div class="name">IRON FURY</div>
+    <!-- PLAYER -->
+    <div class="fighter-hud player-hud">
 
-      <div class="bar healthBar">
+      <div class="name-row">
+        <span>IRON FURY</span>
+        <span id="playerHealthText">100</span>
+      </div>
+
+      <div class="bar health">
         <div id="playerHealth"></div>
       </div>
 
-      <span id="playerHealthText">100</span>
-
-      <div class="bar vitalityBar">
+      <div class="bar vitality">
         <div id="playerVitality"></div>
       </div>
 
-      <span id="playerVitalityText">100</span>
+      <div class="fury-row">
+        <span>FURY</span>
 
-      <div class="fury">
-        <span id="fury1"></span>
-        <span id="fury2"></span>
-        <span id="fury3"></span>
-      </div>
+        <div class="fury-slots">
+          <i id="fury1"></i>
+          <i id="fury2"></i>
+          <i id="fury3"></i>
+        </div>
 
-      <div id="playerFuryText">0 / 3</div>
-    </div>
-
-
-    <div class="centerHud">
-
-      <div class="round">ROUND <span id="roundNumber">1</span></div>
-
-      <div id="timer">60</div>
-
-      <div id="comboCounter">
-        <span id="comboNumber">0</span>
-        <small>HIT COMBO</small>
+        <span id="playerFuryText">
+          0 / 3
+        </span>
       </div>
 
     </div>
 
 
-    <div class="fighterHud enemyHud">
-      <div class="name">RIVAL</div>
+    <!-- CENTER -->
+    <div class="center-hud">
 
-      <div class="bar healthBar">
+      <div class="round">
+        ROUND <span id="roundNumber">1</span>
+      </div>
+
+      <div id="timer">
+        60
+      </div>
+
+    </div>
+
+
+    <!-- ENEMY -->
+    <div class="fighter-hud enemy-hud">
+
+      <div class="name-row">
+        <span>RIVAL</span>
+        <span id="enemyHealthText">100</span>
+      </div>
+
+      <div class="bar health">
         <div id="enemyHealth"></div>
       </div>
 
-      <span id="enemyHealthText">100</span>
-
-      <div class="bar vitalityBar">
+      <div class="bar vitality">
         <div id="enemyVitality"></div>
       </div>
 
-      <span id="enemyVitalityText">100</span>
+      <div class="fury-row">
 
-      <div class="fury">
-        <span id="enemyFury1"></span>
-        <span id="enemyFury2"></span>
-        <span id="enemyFury3"></span>
+        <span id="enemyFuryText">
+          0 / 3
+        </span>
+
+        <div class="fury-slots">
+          <i id="enemyFury1"></i>
+          <i id="enemyFury2"></i>
+          <i id="enemyFury3"></i>
+        </div>
+
+        <span>FURY</span>
+
       </div>
 
-      <div id="enemyFuryText">0 / 3</div>
     </div>
 
   </div>
-
-
-  <!-- MESSAGES -->
-  <div id="messageBox">
-    <div id="message"></div>
-    <div id="subMessage"></div>
-  </div>
-
-  <div id="damageFlash"></div>
-  <div id="furyFlash"></div>
-
-  <div id="damageNumber">0</div>
 
 
   <!-- PAUSE -->
-  <button id="pauseButton">Ⅱ</button>
+  <button id="pauseButton" class="pause-button">
+    Ⅱ
+  </button>
 
-  <div id="pauseMenu" class="overlay hidden">
-    <div class="menuBox">
-      <h1>PAUSED</h1>
-      <button id="resumeButton">RESUME</button>
-      <button id="pauseRestartButton">RESTART</button>
+
+  <!-- FIGHT MESSAGE -->
+  <div id="message" class="fight-message"></div>
+  <div id="subMessage" class="fight-submessage"></div>
+
+
+  <!-- COMBO -->
+  <div id="comboCounter" class="combo-counter">
+    <strong id="comboNumber">0</strong>
+    <span>HIT COMBO</span>
+  </div>
+
+
+  <!-- DAMAGE -->
+  <div id="damageNumber" class="damage-number">
+    0
+  </div>
+
+
+  <div id="damageFlash" class="flash"></div>
+  <div id="furyFlash" class="fury-flash"></div>
+
+
+  <!-- MOBILE CONTROLS -->
+  <div id="controls">
+
+    <div id="joystick" class="joystick">
+      <div id="joystickKnob" class="joystick-knob"></div>
     </div>
+
+
+    <div class="action-buttons">
+
+      <button id="jumpButton" class="control jump">
+        JUMP
+      </button>
+
+      <button id="dashButton" class="control dash">
+        DASH
+      </button>
+
+      <button id="punchButton" class="control punch">
+        PUNCH
+      </button>
+
+      <button id="kickButton" class="control kick">
+        KICK
+      </button>
+
+      <button id="blockButton" class="control block">
+        BLOCK
+      </button>
+
+      <button id="furyButton" class="control fury">
+        FURY
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- PAUSE MENU -->
+  <div id="pauseMenu" class="menu-overlay hidden">
+
+    <div class="menu-card">
+
+      <h1>PAUSED</h1>
+
+      <button id="resumeButton">
+        RESUME
+      </button>
+
+      <button id="pauseRestartButton">
+        RESTART
+      </button>
+
+    </div>
+
   </div>
 
 
   <!-- RESULT -->
-  <div id="resultOverlay" class="overlay hidden">
-    <div class="menuBox">
+  <div id="resultOverlay" class="menu-overlay hidden">
 
-      <h1 id="resultTitle">VICTORY</h1>
+    <div class="menu-card">
+
+      <h1 id="resultTitle">
+        VICTORY
+      </h1>
 
       <p id="resultDescription"></p>
 
-      <div class="results">
-        <div>MAX COMBO <b id="resultCombo">0</b></div>
-        <div>DAMAGE <b id="resultDamage">0</b></div>
-        <div>FURY <b id="resultFury">0</b></div>
+      <div class="stats">
+
+        <div>
+          <b id="resultCombo">0</b>
+          <span>MAX COMBO</span>
+        </div>
+
+        <div>
+          <b id="resultDamage">0</b>
+          <span>DAMAGE</span>
+        </div>
+
+        <div>
+          <b id="resultFury">0</b>
+          <span>FURY USED</span>
+        </div>
+
       </div>
 
-      <button id="restartButton">FIGHT AGAIN</button>
+      <button id="restartButton">
+        FIGHT AGAIN
+      </button>
 
     </div>
+
   </div>
 
 
   <!-- FURY FINISH -->
-  <div id="finishOverlay" class="overlay hidden">
-    <div class="menuBox finishBox">
-      <h1 id="finishTitle">FURY FINISH</h1>
-      <p id="finishSubtitle">THE RIVAL HAS FALLEN</p>
-      <button id="finishButton">FINISH</button>
-    </div>
-  </div>
+  <div id="finishOverlay" class="menu-overlay hidden">
 
+    <div class="menu-card finish-card">
 
-  <!-- MOBILE CONTROLS -->
-  <div id="mobileControls">
+      <h1 id="finishTitle">
+        FURY FINISH
+      </h1>
 
-    <div id="joystick">
-      <div id="joystickKnob"></div>
-    </div>
+      <p id="finishSubtitle">
+        THE RIVAL HAS FALLEN
+      </p>
 
-    <div id="actionButtons">
-
-      <button id="jumpButton" class="action jump">JUMP</button>
-      <button id="dashButton" class="action dash">DASH</button>
-      <button id="punchButton" class="action punch">P</button>
-      <button id="kickButton" class="action kick">K</button>
-      <button id="blockButton" class="action block">B</button>
-      <button id="furyButton" class="action fury">FURY</button>
+      <button id="finishButton">
+        FINISH
+      </button>
 
     </div>
 
@@ -173,6 +272,7 @@
   <!-- THREE.JS -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
+  <!-- GAME -->
   <script src="game.js"></script>
 
 </body>
