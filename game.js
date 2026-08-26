@@ -1,22 +1,9 @@
-Iron Fury — game.js
-
 "use strict";
 
+
 /* ============================================================
-   IRON FURY 3D
-   COMPLETE MATCHED GAME ENGINE
-
-   Fighter
-      ├── createModel()
-      ├── movement
-      ├── jumping
-      ├── dash
-      ├── blocking
-      ├── attacks
-      ├── damage
-      ├── Fury
-      └── animations
-
+   IRON FURY
+   3D FIGHTING GAME ENGINE
    ============================================================ */
 
 const THREE = window.THREE;
@@ -30,20 +17,18 @@ if (!THREE) {
    DOM HELPER
    ============================================================ */
 
-const $ = id => {
+const $ = (id) => {
 
-  const element =
+  const el =
     document.getElementById(id);
 
-  if (!element) {
-
+  if (!el) {
     throw new Error(
-      "Missing HTML element #" + id
+      "Missing #" + id
     );
-
   }
 
-  return element;
+  return el;
 
 };
 
@@ -58,11 +43,11 @@ const canvas =
 const loadingScreen =
   $("loadingScreen");
 
-const loadingProgress =
-  $("loadingProgress");
-
 const loadingText =
   $("loadingText");
+
+const loadingProgress =
+  $("loadingProgress");
 
 
 const playerHealth =
@@ -221,41 +206,27 @@ const furyButton =
    CONSTANTS
    ============================================================ */
 
-const MAX_HEALTH =
-  100;
+const MAX_HEALTH = 100;
 
-const MAX_VITALITY =
-  100;
+const MAX_VITALITY = 100;
 
-const MAX_FURY =
-  3;
+const MAX_FURY = 3;
 
-const ARENA_LIMIT =
-  8.5;
+const ARENA_X = 8.2;
 
-const PLAYER_SPEED =
-  5.3;
+const ARENA_Z = 3.0;
 
-const ENEMY_SPEED =
-  3.25;
+const GRAVITY = 22;
 
-const MOVE_ACCEL =
-  22;
+const JUMP_FORCE = 8.8;
 
-const MOVE_DECEL =
-  28;
+const PLAYER_SPEED = 5.2;
 
-const GRAVITY =
-  21;
+const ENEMY_SPEED = 3.45;
 
-const JUMP_FORCE =
-  8.3;
+const ROUND_TIME = 60;
 
-const ROUND_TIME =
-  60;
-
-const COMBO_TIME =
-  1.15;
+const COMBO_WINDOW = 1.05;
 
 
 /* ============================================================
@@ -271,8 +242,6 @@ const game = {
   ended: false,
 
   time: ROUND_TIME,
-
-  round: 1,
 
   maxCombo: 0,
 
@@ -291,7 +260,11 @@ const input = {
 
   left: false,
 
-  right: false
+  right: false,
+
+  up: false,
+
+  down: false
 
 };
 
@@ -314,7 +287,7 @@ const stick = {
 const renderer =
   new THREE.WebGLRenderer({
 
-    canvas: canvas,
+    canvas,
 
     antialias: true,
 
@@ -325,10 +298,12 @@ const renderer =
 
 
 renderer.setPixelRatio(
+
   Math.min(
     window.devicePixelRatio || 1,
     2
   )
+
 );
 
 
@@ -341,10 +316,8 @@ renderer.setSize(
 renderer.shadowMap.enabled =
   true;
 
-
 renderer.shadowMap.type =
   THREE.PCFSoftShadowMap;
-
 
 renderer.outputColorSpace =
   THREE.SRGBColorSpace;
@@ -360,15 +333,15 @@ const scene =
 
 scene.background =
   new THREE.Color(
-    0x05080c
+    0x05080e
   );
 
 
 scene.fog =
   new THREE.Fog(
-    0x05080c,
-    15,
-    38
+    0x05080e,
+    14,
+    34
   );
 
 
@@ -393,15 +366,8 @@ const camera =
 
 camera.position.set(
   0,
-  4.7,
-  13
-);
-
-
-camera.lookAt(
-  0,
-  2.2,
-  0
+  5.2,
+  14
 );
 
 
@@ -410,24 +376,26 @@ camera.lookAt(
    ============================================================ */
 
 scene.add(
+
   new THREE.HemisphereLight(
-    0x9bcfff,
-    0x11151a,
-    2
+    0x9bd6ff,
+    0x11141b,
+    1.8
   )
+
 );
 
 
 const sun =
   new THREE.DirectionalLight(
     0xffffff,
-    2.7
+    2.6
   );
 
 
 sun.position.set(
   5,
-  11,
+  10,
   8
 );
 
@@ -442,15 +410,13 @@ sun.shadow.mapSize.set(
 );
 
 
-scene.add(
-  sun
-);
+scene.add(sun);
 
 
 const blueLight =
   new THREE.PointLight(
-    0x18aaff,
-    10,
+    0x159dff,
+    12,
     18
   );
 
@@ -469,8 +435,8 @@ scene.add(
 
 const redLight =
   new THREE.PointLight(
-    0xff304d,
-    10,
+    0xff3150,
+    12,
     18
   );
 
@@ -494,19 +460,26 @@ scene.add(
 function mat(
   color,
   metal = 0.15,
-  roughness = 0.58
+  rough = 0.55
 ) {
 
   return new THREE.MeshStandardMaterial({
 
-    color: color,
+    color,
 
-    roughness:
-      roughness,
+    metalness: metal,
 
-    metalness:
-      metal
+    roughness: rough
 
+  });
+
+}
+
+
+function basic(color) {
+
+  return new THREE.MeshBasicMaterial({
+    color
   });
 
 }
@@ -525,9 +498,9 @@ const floor =
     ),
 
     mat(
-      0x111920,
+      0x121b24,
       0.35,
-      0.68
+      0.7
     )
 
   );
@@ -541,171 +514,130 @@ floor.receiveShadow =
   true;
 
 
-scene.add(
-  floor
-);
+scene.add(floor);
 
 
-/* ============================================================
-   GRID
-   ============================================================ */
+/* GRID */
 
 const grid =
   new THREE.GridHelper(
     18,
     36,
-    0x39515e,
-    0x18252d
+    0x35505e,
+    0x18252e
   );
 
 
 grid.position.y =
-  0.01;
+  0.015;
 
 
-scene.add(
-  grid
-);
+scene.add(grid);
 
 
-/* ============================================================
-   BACK WALL
-   ============================================================ */
+/* BACK WALL */
 
-const backWall =
+const wall =
   new THREE.Mesh(
 
     new THREE.BoxGeometry(
       22,
       8,
-      0.5
+      0.45
     ),
 
     mat(
-      0x091016,
+      0x091017,
       0.25,
-      0.75
+      0.8
     )
 
   );
 
 
-backWall.position.set(
+wall.position.set(
   0,
   4,
   -5
 );
 
 
-backWall.receiveShadow =
+wall.receiveShadow =
   true;
 
 
-scene.add(
-  backWall
-);
+scene.add(wall);
 
 
-/* ============================================================
-   ARENA LIGHT MARKERS
-   ============================================================ */
+/* SIDE MARKERS */
 
-function arenaMarker(
-  x,
-  color
+for (
+  const x of [-9, 9]
 ) {
 
-  const group =
-    new THREE.Group();
-
-
-  const pillar =
+  const marker =
     new THREE.Mesh(
 
       new THREE.BoxGeometry(
         0.16,
-        2.8,
+        2.6,
         0.16
       ),
 
-      new THREE.MeshBasicMaterial({
-        color: color
-      })
+      basic(
+        0x28d7ff
+      )
 
     );
 
 
-  pillar.position.y =
-    1.4;
-
-
-  group.add(
-    pillar
+  marker.position.set(
+    x,
+    1.3,
+    -0.3
   );
 
 
-  group.position.x =
-    x;
-
-
-  scene.add(
-    group
-  );
+  scene.add(marker);
 
 }
 
 
-arenaMarker(
-  -9,
-  0x28d7ff
-);
-
-
-arenaMarker(
-  9,
-  0xff4057
-);
-
-
-/* ============================================================
-   ARENA LIGHT BARS
-   ============================================================ */
+/* ARENA RINGS */
 
 for (
-  const x of [-6, -2, 2, 6]
+  const x of [-6, 0, 6]
 ) {
 
-  const bar =
+  const ring =
     new THREE.Mesh(
 
-      new THREE.BoxGeometry(
-        2.2,
-        0.08,
-        0.08
+      new THREE.TorusGeometry(
+        2.5,
+        0.025,
+        8,
+        64
       ),
 
-      new THREE.MeshBasicMaterial({
-
-        color:
-          x < 0
-            ? 0x1ba9ff
-            : 0xff3652
-
-      })
+      basic(
+        0x1c5266
+      )
 
     );
 
 
-  bar.position.set(
+  ring.rotation.x =
+    Math.PI / 2;
+
+
+  ring.position.set(
     x,
-    5.7,
-    -4.65
+    0.03,
+    0
   );
 
 
-  scene.add(
-    bar
-  );
+  scene.add(ring);
 
 }
 
@@ -717,11 +649,11 @@ for (
 const particles = [];
 
 
-function particlesBurst(
+function burst(
   position,
   color,
-  count = 12,
-  power = 1
+  count = 14,
+  power = 4
 ) {
 
   for (
@@ -730,7 +662,7 @@ function particlesBurst(
     i++
   ) {
 
-    const particle =
+    const p =
       new THREE.Mesh(
 
         new THREE.SphereGeometry(
@@ -739,99 +671,81 @@ function particlesBurst(
           6
         ),
 
-        new THREE.MeshBasicMaterial({
-          color: color
-        })
+        basic(color)
 
       );
 
 
-    particle.position.copy(
+    p.position.copy(
       position
     );
 
 
-    particle.userData.life =
-      0.25 +
-      Math.random() * 0.35;
+    p.userData.life =
+      0.3 +
+      Math.random() *
+      0.4;
 
 
-    particle.userData.velocity =
+    p.userData.v =
       new THREE.Vector3(
 
         (Math.random() - 0.5) *
-          4 *
           power,
 
-        (Math.random() * 4 + 1) *
+        Math.random() *
           power,
 
         (Math.random() - 0.5) *
-          3 *
           power
 
       );
 
 
-    scene.add(
-      particle
-    );
+    scene.add(p);
 
-
-    particles.push(
-      particle
-    );
+    particles.push(p);
 
   }
 
 }
 
 
-function updateParticles(
-  dt
-) {
+function updateParticles(dt) {
 
   for (
-    let i =
-      particles.length - 1;
-
+    let i = particles.length - 1;
     i >= 0;
-
     i--
   ) {
 
-    const particle =
+    const p =
       particles[i];
 
 
-    particle.userData.life -=
+    p.userData.life -=
       dt;
 
 
-    particle.userData.velocity.y -=
-      10 * dt;
+    p.userData.v.y -=
+      12 * dt;
 
 
-    particle.position.addScaledVector(
-      particle.userData.velocity,
+    p.position.addScaledVector(
+      p.userData.v,
       dt
     );
 
 
     if (
-      particle.userData.life <=
-      0
+      p.userData.life <= 0
     ) {
 
-      scene.remove(
-        particle
-      );
+      scene.remove(p);
 
+      p.geometry.dispose();
 
-      particle.geometry.dispose();
-
-      particle.material.dispose();
-
+      p.material.dispose();
 
       particles.splice(
         i,
@@ -846,6 +760,78 @@ function updateParticles(
 
 
 /* ============================================================
+   MODEL HELPERS
+   ============================================================ */
+
+function capsule(
+  radius,
+  length,
+  material
+) {
+
+  const mesh =
+    new THREE.Mesh(
+
+      new THREE.CapsuleGeometry(
+        radius,
+        length,
+        6,
+        12
+      ),
+
+      material
+
+    );
+
+
+  mesh.castShadow =
+    true;
+
+
+  return mesh;
+
+}
+
+
+function addBox(
+  parent,
+  size,
+  position,
+  material
+) {
+
+  const mesh =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        ...size
+      ),
+
+      material
+
+    );
+
+
+  mesh.position.set(
+    ...position
+  );
+
+
+  mesh.castShadow =
+    true;
+
+
+  parent.add(
+    mesh
+  );
+
+
+  return mesh;
+
+}
+
+
+/* ============================================================
    FIGHTER CLASS
    ============================================================ */
 
@@ -855,8 +841,7 @@ class Fighter {
     name,
     color,
     accent,
-    playerControlled,
-    skinColor = 0xc88968
+    playerControlled
   ) {
 
     this.name =
@@ -868,15 +853,21 @@ class Fighter {
     this.accent =
       accent;
 
-    this.skinColor =
-      skinColor;
-
     this.playerControlled =
       playerControlled;
 
 
     this.group =
       new THREE.Group();
+
+
+    this.body =
+      new THREE.Group();
+
+
+    this.group.add(
+      this.body
+    );
 
 
     this.health =
@@ -889,10 +880,10 @@ class Fighter {
       0;
 
 
-    this.combo =
+    this.damageDone =
       0;
 
-    this.comboTimer =
+    this.furyUsed =
       0;
 
 
@@ -904,15 +895,6 @@ class Fighter {
       new THREE.Vector3();
 
 
-    /* SMOOTH MOVEMENT */
-
-    this.moveVelocity =
-      0;
-
-    this.moveInput =
-      0;
-
-
     this.facing =
       playerControlled
         ? 1
@@ -922,36 +904,50 @@ class Fighter {
     this.blocking =
       false;
 
+
     this.attacking =
       false;
+
 
     this.attack =
       null;
 
+
     this.attackTime =
       0;
+
 
     this.hitConfirmed =
       false;
 
+
     this.hitStun =
       0;
 
+
     this.dashTime =
       0;
+
 
     this.invincible =
       false;
 
 
-    this.damageDone =
-      0;
-
-    this.furyUsed =
+    this.comboStep =
       0;
 
 
-    /* BUILD 3D CHARACTER */
+    this.comboTimer =
+      0;
+
+
+    this.queuedAttack =
+      null;
+
+
+    this.moveBlend =
+      0;
+
 
     this.createModel();
 
@@ -964,16 +960,16 @@ class Fighter {
 
 
   /* ==========================================================
-     CREATE MODEL
+     CREATE 3D CHARACTER
      ========================================================== */
 
   createModel() {
 
     const skin =
       mat(
-        this.skinColor,
+        0xc88968,
         0.05,
-        0.7
+        0.72
       );
 
 
@@ -981,157 +977,88 @@ class Fighter {
       mat(
         this.color,
         0.35,
-        0.52
+        0.42
       );
 
 
     const accent =
       mat(
         this.accent,
-        0.5,
-        0.4
+        0.55,
+        0.3
       );
 
 
     const dark =
       mat(
-        0x11161b,
-        0.45,
-        0.5
+        0x10151b,
+        0.4,
+        0.38
       );
 
 
-    const sole =
-      mat(
-        0x07090b,
-        0.35,
-        0.7
+    const glow =
+      basic(
+        this.accent
       );
 
 
-    /* BODY ROOT */
-
-    this.body =
-      new THREE.Group();
-
-
-    this.group.add(
-      this.body
-    );
-
-
-    /* ========================================================
-       HIPS
-       ======================================================== */
-
-    this.hips =
-      new THREE.Mesh(
-
-        new THREE.BoxGeometry(
-          0.92,
-          0.45,
-          0.56
-        ),
-
-        dark
-
-      );
-
-
-    this.hips.position.set(
-      0,
-      1.72,
-      0
-    );
-
-
-    this.hips.castShadow =
-      true;
-
-
-    this.body.add(
-      this.hips
-    );
-
-
-    /* ========================================================
-       TORSO
-       ======================================================== */
+    /* TORSO */
 
     this.torso =
-      new THREE.Mesh(
+      addBox(
 
-        new THREE.BoxGeometry(
-          1.12,
-          1.42,
+        this.body,
+
+        [
+          1.08,
+          1.35,
           0.62
-        ),
+        ],
+
+        [
+          0,
+          2.55,
+          0
+        ],
 
         suit
 
       );
 
 
-    this.torso.position.set(
-      0,
-      2.55,
-      0
-    );
+    /* WAIST */
 
+    this.waist =
+      addBox(
 
-    this.torso.castShadow =
-      true;
+        this.body,
 
+        [
+          0.76,
+          0.34,
+          0.56
+        ],
 
-    this.body.add(
-      this.torso
-    );
+        [
+          0,
+          1.83,
+          0
+        ],
 
-
-    /* ========================================================
-       CHEST ARMOR
-       ======================================================== */
-
-    const chest =
-      new THREE.Mesh(
-
-        new THREE.BoxGeometry(
-          0.78,
-          0.48,
-          0.68
-        ),
-
-        accent
+        dark
 
       );
 
 
-    chest.position.set(
-      0,
-      2.78,
-      0.30
-    );
-
-
-    chest.castShadow =
-      true;
-
-
-    this.body.add(
-      chest
-    );
-
-
-    /* ========================================================
-       NECK
-       ======================================================== */
+    /* NECK */
 
     this.neck =
       new THREE.Mesh(
 
         new THREE.CylinderGeometry(
           0.18,
-          0.20,
+          0.2,
           0.28,
           12
         ),
@@ -1143,7 +1070,7 @@ class Fighter {
 
     this.neck.position.set(
       0,
-      3.42,
+      3.34,
       0
     );
 
@@ -1157,16 +1084,14 @@ class Fighter {
     );
 
 
-    /* ========================================================
-       HEAD
-       ======================================================== */
+    /* HEAD */
 
     this.head =
       new THREE.Mesh(
 
         new THREE.SphereGeometry(
           0.43,
-          20,
+          18,
           14
         ),
 
@@ -1175,16 +1100,9 @@ class Fighter {
       );
 
 
-    this.head.scale.set(
-      0.98,
-      1.08,
-      0.95
-    );
-
-
     this.head.position.set(
       0,
-      3.86,
+      3.82,
       0
     );
 
@@ -1198,387 +1116,144 @@ class Fighter {
     );
 
 
-    /* ========================================================
-       HAIR
-       ======================================================== */
+    /* HAIR */
 
-    const hair =
-      new THREE.Mesh(
+    this.hair =
+      addBox(
 
-        new THREE.SphereGeometry(
-          0.445,
-          16,
-          10,
+        this.body,
+
+        [
+          0.62,
+          0.18,
+          0.48
+        ],
+
+        [
           0,
-          Math.PI * 2,
-          0,
-          Math.PI * 0.52
-        ),
+          4.16,
+          -0.02
+        ],
 
         dark
 
       );
 
 
-    hair.position.set(
-      0,
-      4.02,
-      -0.01
-    );
+    /* VISOR */
 
+    this.visor =
+      addBox(
 
-    this.body.add(
-      hair
-    );
+        this.body,
 
-
-    /* ========================================================
-       FACE VISOR
-       ======================================================== */
-
-    const visor =
-      new THREE.Mesh(
-
-        new THREE.BoxGeometry(
+        [
           0.58,
-          0.13,
-          0.09
-        ),
+          0.14,
+          0.08
+        ],
+
+        [
+          0,
+          3.83,
+          0.40
+        ],
 
         dark
 
       );
 
 
-    visor.position.set(
-      0,
-      3.87,
-      0.405
-    );
+    /* CHEST ARMOR */
 
+    this.chest =
+      addBox(
 
-    this.body.add(
-      visor
-    );
+        this.body,
 
+        [
+          0.7,
+          0.36,
+          0.67
+        ],
 
-    /* ========================================================
-       SHOULDERS
-       ======================================================== */
-
-    this.leftShoulder =
-      new THREE.Mesh(
-
-        new THREE.SphereGeometry(
-          0.28,
-          12,
-          8
-        ),
+        [
+          0,
+          2.72,
+          0.33
+        ],
 
         accent
 
       );
 
 
-    this.rightShoulder =
-      this.leftShoulder.clone();
+    /* CHEST EMBLEM */
 
-
-    this.leftShoulder.position.set(
-      -0.72,
-      3.12,
-      0
-    );
-
-
-    this.rightShoulder.position.set(
-      0.72,
-      3.12,
-      0
-    );
-
-
-    this.body.add(
-      this.leftShoulder,
-      this.rightShoulder
-    );
-
-
-    /* ========================================================
-       UPPER ARMS
-       ======================================================== */
-
-    this.leftArm =
-      this.makeLimb(
-        0.18,
-        0.58,
-        suit
-      );
-
-
-    this.rightArm =
-      this.makeLimb(
-        0.18,
-        0.58,
-        suit
-      );
-
-
-    this.leftArm.position.set(
-      -0.76,
-      3.08,
-      0
-    );
-
-
-    this.rightArm.position.set(
-      0.76,
-      3.08,
-      0
-    );
-
-
-    this.body.add(
-      this.leftArm,
-      this.rightArm
-    );
-
-
-    /* ========================================================
-       FOREARMS
-       ======================================================== */
-
-    this.leftForearm =
-      this.makeLimb(
-        0.16,
-        0.52,
-        suit
-      );
-
-
-    this.rightForearm =
-      this.makeLimb(
-        0.16,
-        0.52,
-        suit
-      );
-
-
-    this.leftForearm.position.y =
-      -0.57;
-
-
-    this.rightForearm.position.y =
-      -0.57;
-
-
-    this.leftArm.add(
-      this.leftForearm
-    );
-
-
-    this.rightArm.add(
-      this.rightForearm
-    );
-
-
-    /* ========================================================
-       GLOVES
-       ======================================================== */
-
-    this.leftFist =
+    const emblem =
       new THREE.Mesh(
 
-        new THREE.BoxGeometry(
-          0.31,
-          0.30,
-          0.34
-        ),
-
-        accent
-
-      );
-
-
-    this.rightFist =
-      this.leftFist.clone();
-
-
-    this.leftFist.position.set(
-      0,
-      -0.32,
-      0.02
-    );
-
-
-    this.rightFist.position.set(
-      0,
-      -0.32,
-      0.02
-    );
-
-
-    this.leftForearm.add(
-      this.leftFist
-    );
-
-
-    this.rightForearm.add(
-      this.rightFist
-    );
-
-
-    /* ========================================================
-       THIGHS
-       ======================================================== */
-
-    this.leftLeg =
-      this.makeLimb(
-        0.25,
-        0.72,
-        dark
-      );
-
-
-    this.rightLeg =
-      this.makeLimb(
-        0.25,
-        0.72,
-        dark
-      );
-
-
-    this.leftLeg.position.set(
-      -0.30,
-      1.52,
-      0
-    );
-
-
-    this.rightLeg.position.set(
-      0.30,
-      1.52,
-      0
-    );
-
-
-    this.body.add(
-      this.leftLeg,
-      this.rightLeg
-    );
-
-
-    /* ========================================================
-       SHINS
-       ======================================================== */
-
-    this.leftShin =
-      this.makeLimb(
-        0.21,
-        0.72,
-        suit
-      );
-
-
-    this.rightShin =
-      this.makeLimb(
-        0.21,
-        0.72,
-        suit
-      );
-
-
-    this.leftShin.position.y =
-      -0.70;
-
-
-    this.rightShin.position.y =
-      -0.70;
-
-
-    this.leftLeg.add(
-      this.leftShin
-    );
-
-
-    this.rightLeg.add(
-      this.rightShin
-    );
-
-
-    /* ========================================================
-       BOOTS
-       ======================================================== */
-
-    this.leftFoot =
-      new THREE.Mesh(
-
-        new THREE.BoxGeometry(
-          0.38,
-          0.22,
-          0.65
-        ),
-
-        sole
-
-      );
-
-
-    this.rightFoot =
-      this.leftFoot.clone();
-
-
-    this.leftFoot.position.set(
-      0,
-      -0.42,
-      0.12
-    );
-
-
-    this.rightFoot.position.set(
-      0,
-      -0.42,
-      0.12
-    );
-
-
-    this.leftShin.add(
-      this.leftFoot
-    );
-
-
-    this.rightShin.add(
-      this.rightFoot
-    );
-
-
-    /* ========================================================
-       BELT
-       ======================================================== */
-
-    const belt =
-      new THREE.Mesh(
-
-        new THREE.BoxGeometry(
-          1.0,
+        new THREE.TorusGeometry(
           0.16,
-          0.64
+          0.045,
+          8,
+          20
         ),
 
-        accent
+        glow
 
       );
 
 
-    belt.position.set(
+    emblem.position.set(
       0,
-      1.91,
-      0
+      2.72,
+      0.68
     );
 
 
+    emblem.rotation.x =
+      Math.PI / 2;
+
+
     this.body.add(
-      belt
+      emblem
+    );
+
+
+    /* ARMS */
+
+    this.buildArm(
+      "left",
+      -0.7,
+      suit,
+      accent
+    );
+
+
+    this.buildArm(
+      "right",
+      0.7,
+      suit,
+      accent
+    );
+
+
+    /* LEGS */
+
+    this.buildLeg(
+      "left",
+      -0.3,
+      dark,
+      accent
+    );
+
+
+    this.buildLeg(
+      "right",
+      0.3,
+      dark,
+      accent
     );
 
 
@@ -1588,81 +1263,300 @@ class Fighter {
 
 
   /* ==========================================================
-     LIMB CREATOR
+     ARM
      ========================================================== */
 
-  makeLimb(
-    radius,
-    length,
-    material
+  buildArm(
+    side,
+    x,
+    suit,
+    accent
   ) {
 
-    const pivot =
+    const arm =
+      this[
+        side + "Arm"
+      ] =
       new THREE.Group();
 
 
-    const mesh =
+    arm.position.set(
+      x,
+      3.05,
+      0
+    );
+
+
+    this.body.add(
+      arm
+    );
+
+
+    arm.rotation.z =
+      side === "left"
+        ? 0.12
+        : -0.12;
+
+
+    const upper =
+      capsule(
+        0.19,
+        0.52,
+        suit
+      );
+
+
+    upper.position.y =
+      -0.27;
+
+
+    arm.add(
+      upper
+    );
+
+
+    const fore =
+      this[
+        side + "Forearm"
+      ] =
+      new THREE.Group();
+
+
+    fore.position.y =
+      -0.55;
+
+
+    arm.add(
+      fore
+    );
+
+
+    const foreMesh =
+      capsule(
+        0.17,
+        0.48,
+        suit
+      );
+
+
+    foreMesh.position.y =
+      -0.25;
+
+
+    fore.add(
+      foreMesh
+    );
+
+
+    const glove =
       new THREE.Mesh(
 
-        new THREE.CylinderGeometry(
-          radius,
-          radius * 1.05,
-          length,
+        new THREE.SphereGeometry(
+          0.2,
+          12,
           10
         ),
 
-        material
+        accent
 
       );
 
 
-    mesh.position.y =
-      -length / 2;
-
-
-    mesh.castShadow =
-      true;
-
-
-    pivot.add(
-      mesh
+    glove.position.set(
+      0,
+      -0.56,
+      0.02
     );
 
 
-    return pivot;
+    glove.castShadow =
+      true;
+
+
+    fore.add(
+      glove
+    );
+
+
+    this[
+      side + "Glove"
+    ] =
+      glove;
+
+
+    /* SHOULDER */
+
+    const pad =
+      new THREE.Mesh(
+
+        new THREE.SphereGeometry(
+          0.25,
+          12,
+          8
+        ),
+
+        accent
+
+      );
+
+
+    pad.scale.set(
+      1,
+      0.65,
+      0.8
+    );
+
+
+    pad.position.set(
+      0,
+      0.02,
+      0
+    );
+
+
+    pad.castShadow =
+      true;
+
+
+    arm.add(
+      pad
+    );
 
   }
 
 
   /* ==========================================================
-     RESET POSE
+     LEG
+     ========================================================== */
+
+  buildLeg(
+    side,
+    x,
+    dark,
+    accent
+  ) {
+
+    const leg =
+      this[
+        side + "Leg"
+      ] =
+      new THREE.Group();
+
+
+    leg.position.set(
+      x,
+      1.65,
+      0
+    );
+
+
+    this.body.add(
+      leg
+    );
+
+
+    const thigh =
+      capsule(
+        0.25,
+        0.68,
+        dark
+      );
+
+
+    thigh.position.y =
+      -0.36;
+
+
+    leg.add(
+      thigh
+    );
+
+
+    const shin =
+      this[
+        side + "Shin"
+      ] =
+      new THREE.Group();
+
+
+    shin.position.y =
+      -0.72;
+
+
+    leg.add(
+      shin
+    );
+
+
+    const shinMesh =
+      capsule(
+        0.21,
+        0.62,
+        dark
+      );
+
+
+    shinMesh.position.y =
+      -0.31;
+
+
+    shin.add(
+      shinMesh
+    );
+
+
+    addBox(
+
+      shin,
+
+      [
+        0.38,
+        0.24,
+        0.65
+      ],
+
+      [
+        0,
+        -0.69,
+        0.12
+      ],
+
+      accent
+
+    );
+
+  }
+
+
+  /* ==========================================================
+     POSE
      ========================================================== */
 
   resetPose() {
 
     this.leftArm.rotation.set(
-      0.18,
+      0.05,
       0,
-      0.15
+      0.16
     );
 
 
     this.rightArm.rotation.set(
-      0.18,
+      0.05,
       0,
-      -0.15
+      -0.16
     );
 
 
     this.leftForearm.rotation.set(
-      0.1,
+      0,
       0,
       0
     );
 
 
     this.rightForearm.rotation.set(
-      0.1,
+      0,
       0,
       0
     );
@@ -1682,21 +1576,7 @@ class Fighter {
     );
 
 
-    this.leftShin.rotation.set(
-      0,
-      0,
-      0
-    );
-
-
-    this.rightShin.rotation.set(
-      0,
-      0,
-      0
-    );
-
-
-    this.torso.rotation.set(
+    this.body.rotation.set(
       0,
       0,
       0
@@ -1717,7 +1597,9 @@ class Fighter {
      ========================================================== */
 
   move(
-    direction
+    dx,
+    dz,
+    dt
   ) {
 
     if (
@@ -1727,82 +1609,58 @@ class Fighter {
       this.dashTime > 0
     ) {
 
-      this.moveInput =
-        0;
+      return;
+
+    }
+
+
+    const length =
+      Math.hypot(
+        dx,
+        dz
+      );
+
+
+    if (
+      length < 0.01
+    ) {
+
+      this.moveBlend *=
+        0.8;
 
       return;
 
     }
 
 
-    this.moveInput =
-      THREE.MathUtils.clamp(
-        direction,
-        -1,
-        1
+    dx /= length;
+    dz /= length;
+
+
+    const speed =
+      this.playerControlled
+        ? PLAYER_SPEED
+        : ENEMY_SPEED;
+
+
+    this.group.position.x +=
+      dx *
+      speed *
+      dt;
+
+
+    this.group.position.z +=
+      dz *
+      speed *
+      dt;
+
+
+    this.moveBlend =
+      Math.min(
+        1,
+        this.moveBlend +
+          dt * 7
       );
-
-  }
-
-
-  /* ==========================================================
-     SMOOTH MOVEMENT
-     ========================================================== */
-
-  updateMovement(
-    dt
-  ) {
-
-    const target =
-      this.moveInput *
-      (
-        this.playerControlled
-          ? PLAYER_SPEED
-          : ENEMY_SPEED
-      );
-
-
-    const rate =
-      Math.abs(target) >
-      Math.abs(this.moveVelocity)
-        ? MOVE_ACCEL
-        : MOVE_DECEL;
-
-
-    this.moveVelocity =
-      THREE.MathUtils.damp(
-        this.moveVelocity,
-        target,
-        rate,
-        dt
-      );
-
-
-    if (
-      Math.abs(
-        this.moveVelocity
-      ) > 0.02 &&
-      !this.attacking &&
-      !this.blocking
-    ) {
-
-      this.group.position.x +=
-        this.moveVelocity *
-        dt;
-
-    }
-
-
-    if (
-      Math.abs(
-        this.moveVelocity
-      ) <= 0.02
-    ) {
-
-      this.moveVelocity =
-        0;
-
-    }
 
   }
 
@@ -1833,19 +1691,17 @@ class Fighter {
       false;
 
 
-    particlesBurst(
+    burst(
 
-      new THREE.Vector3(
-        this.group.position.x,
-        0.15,
-        0
-      ),
+      this.group.position
+        .clone()
+        .setY(0.15),
 
       this.accent,
 
-      7,
+      8,
 
-      0.65
+      2
 
     );
 
@@ -1877,23 +1733,17 @@ class Fighter {
       true;
 
 
-    this.moveVelocity =
-      0;
+    burst(
 
-
-    particlesBurst(
-
-      new THREE.Vector3(
-        this.group.position.x,
-        1,
-        0
-      ),
+      this.group.position
+        .clone()
+        .setY(1),
 
       this.accent,
 
       10,
 
-      1.2
+      3
 
     );
 
@@ -1904,9 +1754,7 @@ class Fighter {
      BLOCK
      ========================================================== */
 
-  block(
-    value
-  ) {
+  block(value) {
 
     if (
       this.attacking ||
@@ -1924,59 +1772,6 @@ class Fighter {
     this.blocking =
       value;
 
-
-    if (value) {
-
-      this.moveVelocity =
-        0;
-
-    }
-
-  }
-
-
-  /* ==========================================================
-     PHYSICS
-     ========================================================== */
-
-  physics(
-    dt
-  ) {
-
-    if (
-      !this.grounded
-    ) {
-
-      this.velocity.y -=
-        GRAVITY *
-        dt;
-
-
-      this.group.position.y +=
-        this.velocity.y *
-        dt;
-
-
-      if (
-        this.group.position.y <=
-        0
-      ) {
-
-        this.group.position.y =
-          0;
-
-
-        this.velocity.y =
-          0;
-
-
-        this.grounded =
-          true;
-
-      }
-
-    }
-
   }
 
 
@@ -1984,20 +1779,10 @@ class Fighter {
      ATTACK
      ========================================================== */
 
-  startAttack(
-    type
+  beginAttack(
+    type,
+    continueCombo = false
   ) {
-
-    if (
-      this.attacking ||
-      this.blocking ||
-      this.hitStun > 0
-    ) {
-
-      return;
-
-    }
-
 
     this.attacking =
       true;
@@ -2011,158 +1796,40 @@ class Fighter {
       false;
 
 
-    this.moveVelocity =
-      0;
-
-
     this.attackTime =
       type === "punch"
-        ? 0.42
+        ? 0.40
         : type === "kick"
           ? 0.55
-          : 1.15;
-
-  }
-
-
-  /* ==========================================================
-     ATTACK UPDATE
-     ========================================================== */
-
-  updateAttack(
-    dt,
-    opponent
-  ) {
-
-    this.attackTime -=
-      dt;
-
-
-    const duration =
-      this.attack === "punch"
-        ? 0.42
-        : this.attack === "kick"
-          ? 0.55
-          : 1.15;
-
-
-    const progress =
-      1 -
-      this.attackTime /
-      duration;
+          : 1.05;
 
 
     if (
-      !this.hitConfirmed &&
-      progress > 0.30 &&
-      progress < 0.72
+      !continueCombo
     ) {
 
-      this.hitConfirmed =
-        true;
+      this.comboStep =
 
+        this.comboTimer > 0 &&
+        this.comboStep > 0
 
-      const distance =
-        Math.abs(
+          ? Math.min(
+              3,
+              this.comboStep + 1
+            )
 
-          opponent.group.position.x -
-          this.group.position.x
-
-        );
-
-
-      const range =
-        this.attack === "kick"
-          ? 2.15
-          : this.attack === "fury"
-            ? 3.3
-            : 1.75;
-
-
-      if (
-        distance <=
-        range
-      ) {
-
-        let damage;
-
-
-        if (
-          this.attack ===
-          "punch"
-        ) {
-
-          damage =
-            7;
-
-        }
-
-        else if (
-          this.attack ===
-          "kick"
-        ) {
-
-          damage =
-            10;
-
-        }
-
-        else {
-
-          damage =
-            15 +
-            this.furyUsed *
-            8;
-
-        }
-
-
-        opponent.takeDamage(
-          damage,
-          this
-        );
-
-      }
-
-    }
-
-
-    if (
-      this.attackTime <=
-      0
-    ) {
-
-      this.attacking =
-        false;
-
-
-      this.attack =
-        null;
-
-
-      this.attackTime =
-        0;
-
-
-      this.resetPose();
+          : 1;
 
     }
 
   }
 
 
-  /* ==========================================================
-     DAMAGE
-     ========================================================== */
-
-  takeDamage(
-    damage,
-    attacker
-  ) {
+  startAttack(type) {
 
     if (
-      this.invincible ||
-      game.ended
+      this.hitStun > 0 ||
+      this.blocking
     ) {
 
       return;
@@ -2170,165 +1837,54 @@ class Fighter {
     }
 
 
-    let actual =
-      damage;
-
+    /* QUEUE NEXT COMBO HIT */
 
     if (
-      this.blocking
+      this.attacking
     ) {
 
-      actual *=
-        0.2;
+      const duration =
+
+        this.attack === "punch"
+          ? 0.40
+          : this.attack === "kick"
+            ? 0.55
+            : 1.05;
 
 
-      this.vitality =
-        Math.max(
-
-          0,
-
-          this.vitality -
-          damage * 0.15
-
-        );
-
-    }
-
-    else {
-
-      this.vitality =
-        Math.max(
-
-          0,
-
-          this.vitality -
-          damage * 0.08
-
-        );
+      const progress =
+        1 -
+        this.attackTime /
+          duration;
 
 
-      this.hitStun =
-        0.2;
+      if (
+        progress > 0.52 &&
+        this.comboStep < 3
+      ) {
+
+        this.queuedAttack =
+          type;
 
 
-      this.moveVelocity =
-        attacker.facing *
-        2;
+        this.comboStep =
+          Math.min(
+            3,
+            this.comboStep + 1
+          );
+
+      }
 
 
-      this.comboTimer =
-        COMBO_TIME;
+      return;
 
     }
 
 
-    this.health =
-      Math.max(
-
-        0,
-
-        this.health -
-        actual
-
-      );
-
-
-    attacker.damageDone +=
-      actual;
-
-
-    if (
-      attacker.playerControlled
-    ) {
-
-      attacker.combo++;
-
-
-      attacker.comboTimer =
-        COMBO_TIME;
-
-
-      game.maxCombo =
-        Math.max(
-
-          game.maxCombo,
-
-          attacker.combo
-
-        );
-
-
-      game.totalDamage +=
-        actual;
-
-
-      gainFury(
-        attacker,
-        actual
-      );
-
-
-      showDamage(
-        actual
-      );
-
-    }
-
-
-    game.cameraShake =
-      Math.min(
-
-        0.25,
-
-        game.cameraShake +
-        0.09
-
-      );
-
-
-    particlesBurst(
-
-      new THREE.Vector3(
-
-        this.group.position.x,
-
-        2.5 +
-        this.group.position.y,
-
-        0.5
-
-      ),
-
-      this.blocking
-        ? 0xb76cff
-        : 0xffbf3d,
-
-      this.blocking
-        ? 7
-        : 12,
-
-      this.blocking
-        ? 0.7
-        : 1
-
+    this.beginAttack(
+      type,
+      false
     );
-
-
-    updateHUD();
-
-
-    if (
-      this.health <=
-      0
-    ) {
-
-      this.health =
-        0;
-
-
-      checkWinner();
-
-    }
 
   }
 
@@ -2365,20 +1921,22 @@ class Fighter {
       level;
 
 
-    this.attacking =
-      true;
+    this.comboStep =
+      0;
 
 
-    this.attack =
-      "fury";
+    this.comboTimer =
+      0;
 
 
-    this.attackTime =
-      1.15;
+    this.queuedAttack =
+      null;
 
 
-    this.hitConfirmed =
-      false;
+    this.beginAttack(
+      "fury",
+      true
+    );
 
 
     furyFlash.classList.remove(
@@ -2394,29 +1952,666 @@ class Fighter {
     );
 
 
-    particlesBurst(
+    burst(
 
-      new THREE.Vector3(
-
-        this.group.position.x,
-
-        2.5 +
-        this.group.position.y,
-
-        0
-
-      ),
+      this.group.position
+        .clone()
+        .setY(2.2),
 
       this.accent,
 
-      35,
+      40,
 
-      1.5
+      7
 
     );
 
 
     updateHUD();
+
+  }
+
+
+  /* ==========================================================
+     ATTACK UPDATE
+     ========================================================== */
+
+  updateAttack(
+    dt,
+    opponent
+  ) {
+
+    this.attackTime -=
+      dt;
+
+
+    const duration =
+
+      this.attack === "punch"
+        ? 0.40
+        : this.attack === "kick"
+          ? 0.55
+          : 1.05;
+
+
+    const progress =
+
+      1 -
+      this.attackTime /
+        duration;
+
+
+    if (
+      !this.hitConfirmed &&
+      progress > 0.30 &&
+      progress < 0.72
+    ) {
+
+      this.hitConfirmed =
+        true;
+
+
+      const distance =
+        this.group.position
+          .distanceTo(
+            opponent.group.position
+          );
+
+
+      const range =
+
+        this.attack === "kick"
+          ? 2.25
+          : this.attack === "fury"
+            ? 3.4
+            : 1.75;
+
+
+      if (
+        distance <= range &&
+        Math.abs(
+          opponent.group.position.y -
+          this.group.position.y
+        ) < 1.3
+      ) {
+
+        let damage =
+
+          this.attack === "punch"
+            ? 7
+            : this.attack === "kick"
+              ? 10
+              : 18 +
+                this.furyUsed * 5;
+
+
+        /* THIRD HIT BONUS */
+
+        if (
+          this.playerControlled &&
+          this.attack !== "fury" &&
+          this.comboStep === 3
+        ) {
+
+          damage += 7;
+
+        }
+
+
+        opponent.takeDamage(
+          damage,
+          this
+        );
+
+
+        if (
+          this.playerControlled &&
+          this.comboStep >= 2
+        ) {
+
+          showCombo(
+            this.comboStep
+          );
+
+        }
+
+
+        burst(
+
+          opponent.group.position
+            .clone()
+            .setY(2.4),
+
+          opponent.blocking
+            ? 0xb76cff
+            : 0xffc247,
+
+          opponent.blocking
+            ? 8
+            : 16,
+
+          4.5
+
+        );
+
+      }
+
+    }
+
+
+    if (
+      this.attackTime <= 0
+    ) {
+
+      this.attacking =
+        false;
+
+
+      this.attack =
+        null;
+
+
+      this.attackTime =
+        0;
+
+
+      this.body.scale.set(
+        1,
+        1,
+        1
+      );
+
+
+      /* CONTINUE COMBO */
+
+      if (
+        this.queuedAttack
+      ) {
+
+        const next =
+          this.queuedAttack;
+
+
+        this.queuedAttack =
+          null;
+
+
+        this.beginAttack(
+          next,
+          true
+        );
+
+      }
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     DAMAGE
+     ========================================================== */
+
+  takeDamage(
+    damage,
+    attacker
+  ) {
+
+    if (
+      this.invincible ||
+      game.ended
+    ) {
+
+      return;
+
+    }
+
+
+    let actual =
+      damage;
+
+
+    if (
+      this.blocking
+    ) {
+
+      actual *= 0.2;
+
+
+      this.vitality =
+        Math.max(
+          0,
+          this.vitality -
+            damage * 0.10
+        );
+
+    }
+
+    else {
+
+      this.vitality =
+        Math.max(
+          0,
+          this.vitality -
+            damage * 0.07
+        );
+
+
+      this.hitStun =
+        0.18;
+
+
+      this.velocity.copy(
+
+        new THREE.Vector3(
+          attacker.facing * 2.2,
+          0,
+          0
+        )
+
+      );
+
+
+      this.comboTimer =
+        COMBO_WINDOW;
+
+    }
+
+
+    this.health =
+      Math.max(
+        0,
+        this.health -
+          actual
+      );
+
+
+    attacker.damageDone +=
+      actual;
+
+
+    if (
+      attacker.playerControlled
+    ) {
+
+      attacker.comboTimer =
+        COMBO_WINDOW;
+
+
+      game.maxCombo =
+        Math.max(
+          game.maxCombo,
+          attacker.comboStep
+        );
+
+
+      game.totalDamage +=
+        actual;
+
+
+      gainFury(
+        attacker,
+        actual
+      );
+
+
+      showDamage(
+        actual
+      );
+
+    }
+
+
+    game.cameraShake =
+      Math.min(
+        0.28,
+        game.cameraShake +
+          0.10
+      );
+
+
+    updateHUD();
+
+
+    if (
+      this.health <= 0
+    ) {
+
+      this.health =
+        0;
+
+
+      checkWinner();
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     PHYSICS
+     ========================================================== */
+
+  physics(dt) {
+
+    if (
+      !this.grounded
+    ) {
+
+      this.velocity.y -=
+        GRAVITY * dt;
+
+
+      this.group.position.y +=
+        this.velocity.y *
+        dt;
+
+
+      if (
+        this.group.position.y <= 0
+      ) {
+
+        this.group.position.y =
+          0;
+
+
+        this.velocity.y =
+          0;
+
+
+        this.grounded =
+          true;
+
+      }
+
+    }
+
+
+    if (
+      this.hitStun > 0
+    ) {
+
+      this.group.position.x +=
+        this.velocity.x *
+        dt;
+
+
+      this.velocity.x *=
+        Math.pow(
+          0.01,
+          dt
+        );
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     FACE OPPONENT
+     ========================================================== */
+
+  faceOpponent(
+    opponent
+  ) {
+
+    const dx =
+      opponent.group.position.x -
+      this.group.position.x;
+
+
+    const dz =
+      opponent.group.position.z -
+      this.group.position.z;
+
+
+    if (
+      Math.abs(dx) +
+      Math.abs(dz) <
+      0.01
+    ) {
+
+      return;
+
+    }
+
+
+    this.facing =
+      dx >= 0
+        ? 1
+        : -1;
+
+
+    this.group.rotation.y =
+      Math.atan2(
+        dx,
+        dz
+      ) -
+      Math.PI / 2;
+
+  }
+
+
+  /* ==========================================================
+     ANIMATION
+     ========================================================== */
+
+  animate() {
+
+    const time =
+      performance.now() *
+      0.008;
+
+
+    const bob =
+      Math.sin(time) *
+      0.025;
+
+
+    if (
+      this.hitStun > 0
+    ) {
+
+      this.body.rotation.z =
+        0.22 *
+        this.facing;
+
+      return;
+
+    }
+
+
+    this.body.rotation.z =
+      0;
+
+
+    this.body.position.y =
+      bob;
+
+
+    /* BLOCK */
+
+    if (
+      this.blocking
+    ) {
+
+      this.leftArm.rotation.x =
+        -0.8;
+
+      this.rightArm.rotation.x =
+        -0.8;
+
+      this.leftArm.rotation.z =
+        0.65;
+
+      this.rightArm.rotation.z =
+        -0.65;
+
+      return;
+
+    }
+
+
+    /* ATTACK */
+
+    if (
+      this.attacking
+    ) {
+
+      const duration =
+
+        this.attack === "punch"
+          ? 0.40
+          : this.attack === "kick"
+            ? 0.55
+            : 1.05;
+
+
+      const progress =
+        THREE.MathUtils.clamp(
+
+          1 -
+          this.attackTime /
+            duration,
+
+          0,
+          1
+
+        );
+
+
+      const swing =
+        Math.sin(
+          progress *
+          Math.PI
+        );
+
+
+      /* PUNCH */
+
+      if (
+        this.attack ===
+        "punch"
+      ) {
+
+        if (
+          this.facing === 1
+        ) {
+
+          this.rightArm.rotation.x =
+            -1.65 *
+            swing;
+
+
+          this.rightForearm.rotation.x =
+            -0.35 *
+            swing;
+
+        }
+
+        else {
+
+          this.leftArm.rotation.x =
+            -1.65 *
+            swing;
+
+
+          this.leftForearm.rotation.x =
+            -0.35 *
+            swing;
+
+        }
+
+      }
+
+
+      /* KICK */
+
+      else if (
+        this.attack ===
+        "kick"
+      ) {
+
+        if (
+          this.facing === 1
+        ) {
+
+          this.rightLeg.rotation.x =
+            -1.35 *
+            swing;
+
+        }
+
+        else {
+
+          this.leftLeg.rotation.x =
+            -1.35 *
+            swing;
+
+        }
+
+      }
+
+
+      /* FURY */
+
+      else {
+
+        const pulse =
+          1 +
+          Math.sin(
+            time * 4
+          ) *
+          0.08;
+
+
+        this.body.scale.set(
+          pulse,
+          pulse,
+          pulse
+        );
+
+
+        this.leftArm.rotation.x =
+          -1.35;
+
+
+        this.rightArm.rotation.x =
+          -1.35;
+
+      }
+
+
+      return;
+
+    }
+
+
+    /* WALK */
+
+    const walk =
+      Math.sin(
+        performance.now() *
+        0.012
+      ) *
+      0.45 *
+      this.moveBlend;
+
+
+    this.leftArm.rotation.x =
+      walk;
+
+
+    this.rightArm.rotation.x =
+      -walk;
+
+
+    this.leftLeg.rotation.x =
+      -walk * 0.65;
+
+
+    this.rightLeg.rotation.x =
+      walk * 0.65;
 
   }
 
@@ -2434,38 +2629,16 @@ class Fighter {
       this.hitStun > 0
     ) {
 
-      this.hitStun -=
-        dt;
-
-
-      this.blocking =
-        false;
-
-
-      this.moveInput =
-        0;
-
-
-      this.updateMovement(
-        dt
-      );
-
-
-      this.physics(
-        dt
-      );
-
-
-      this.animateHit();
-
-
-      this.limitPosition();
-
-
-      return;
+      this.hitStun =
+        Math.max(
+          0,
+          this.hitStun - dt
+        );
 
     }
 
+
+    /* DASH */
 
     if (
       this.dashTime > 0
@@ -2475,14 +2648,62 @@ class Fighter {
         dt;
 
 
+      this.invincible =
+        true;
+
+
+      let dx = 0;
+      let dz = 0;
+
+
+      if (
+        this.playerControlled
+      ) {
+
+        dx =
+          (input.right ? 1 : 0) -
+          (input.left ? 1 : 0);
+
+
+        dz =
+          (input.down ? 1 : 0) -
+          (input.up ? 1 : 0);
+
+      }
+
+
+      if (
+        !this.playerControlled ||
+        Math.abs(dx) +
+        Math.abs(dz) < 0.1
+      ) {
+
+        dx =
+          this.facing;
+
+        dz =
+          0;
+
+      }
+
+
+      const length =
+        Math.hypot(
+          dx,
+          dz
+        ) || 1;
+
+
       this.group.position.x +=
-        this.facing *
+        (dx / length) *
         13 *
         dt;
 
 
-      this.invincible =
-        true;
+      this.group.position.z +=
+        (dz / length) *
+        13 *
+        dt;
 
     }
 
@@ -2506,14 +2727,7 @@ class Fighter {
     }
 
 
-    this.updateMovement(
-      dt
-    );
-
-
-    this.physics(
-      dt
-    );
+    this.physics(dt);
 
 
     this.faceOpponent(
@@ -2521,359 +2735,27 @@ class Fighter {
     );
 
 
+    this.limit();
+
+
     this.animate();
 
 
-    this.limitPosition();
-
-
-    this.comboTimer -=
-      dt;
-
-
     if (
-      this.comboTimer <=
-      0
+      this.comboTimer > 0
     ) {
 
-      this.combo =
+      this.comboTimer -=
+        dt;
+
+    }
+
+    else {
+
+      this.comboStep =
         0;
 
     }
-
-
-    this.moveInput =
-      0;
-
-  }
-
-
-  /* ==========================================================
-     ANIMATION
-     ========================================================== */
-
-  animate() {
-
-    const t =
-      performance.now() *
-      0.008;
-
-
-    /* BLOCK */
-
-    if (
-      this.blocking
-    ) {
-
-      this.leftArm.rotation.set(
-        -0.95,
-        0,
-        0.55
-      );
-
-
-      this.rightArm.rotation.set(
-        -0.95,
-        0,
-        -0.55
-      );
-
-
-      this.leftForearm.rotation.set(
-        -0.2,
-        0,
-        -0.15
-      );
-
-
-      this.rightForearm.rotation.set(
-        -0.2,
-        0,
-        0.15
-      );
-
-
-      return;
-
-    }
-
-
-    /* ATTACK */
-
-    if (
-      this.attacking
-    ) {
-
-      const duration =
-        this.attack === "punch"
-          ? 0.42
-          : this.attack === "kick"
-            ? 0.55
-            : 1.15;
-
-
-      const progress =
-        THREE.MathUtils.clamp(
-
-          1 -
-          this.attackTime /
-          duration,
-
-          0,
-          1
-
-        );
-
-
-      const swing =
-        Math.sin(
-          progress *
-          Math.PI
-        );
-
-
-      /* PUNCH */
-
-      if (
-        this.attack ===
-        "punch"
-      ) {
-
-        const arm =
-          this.facing === 1
-            ? this.rightArm
-            : this.leftArm;
-
-
-        const forearm =
-          this.facing === 1
-            ? this.rightForearm
-            : this.leftForearm;
-
-
-        arm.rotation.x =
-          -1.55 *
-          swing;
-
-
-        forearm.rotation.x =
-          -0.65 *
-          swing;
-
-      }
-
-
-      /* KICK */
-
-      else if (
-        this.attack ===
-        "kick"
-      ) {
-
-        const leg =
-          this.facing === 1
-            ? this.rightLeg
-            : this.leftLeg;
-
-
-        const shin =
-          this.facing === 1
-            ? this.rightShin
-            : this.leftShin;
-
-
-        leg.rotation.x =
-          -1.15 *
-          swing;
-
-
-        shin.rotation.x =
-          -0.65 *
-          swing;
-
-      }
-
-
-      /* FURY */
-
-      else {
-
-        const pulse =
-          1 +
-          Math.sin(
-            t * 4
-          ) *
-          0.08;
-
-
-        this.body.scale.set(
-          pulse,
-          pulse,
-          pulse
-        );
-
-
-        this.leftArm.rotation.x =
-          -1.35;
-
-
-        this.rightArm.rotation.x =
-          -1.35;
-
-
-        this.leftForearm.rotation.x =
-          -0.5;
-
-
-        this.rightForearm.rotation.x =
-          -0.5;
-
-      }
-
-
-      return;
-
-    }
-
-
-    /* JUMP */
-
-    if (
-      !this.grounded
-    ) {
-
-      this.leftLeg.rotation.x =
-        -0.28;
-
-
-      this.rightLeg.rotation.x =
-        0.28;
-
-
-      this.leftShin.rotation.x =
-        0.18;
-
-
-      this.rightShin.rotation.x =
-        0.18;
-
-
-      return;
-
-    }
-
-
-    /* WALK */
-
-    const walking =
-      Math.abs(
-        this.moveVelocity
-      ) > 0.08;
-
-
-    const swing =
-      walking
-        ? Math.sin(
-            t * 2.6
-          )
-        : 0;
-
-
-    this.leftArm.rotation.x =
-      swing * 0.22;
-
-
-    this.rightArm.rotation.x =
-      -swing * 0.22;
-
-
-    this.leftLeg.rotation.x =
-      -swing * 0.18;
-
-
-    this.rightLeg.rotation.x =
-      swing * 0.18;
-
-
-    this.leftShin.rotation.x =
-      Math.max(
-        0,
-        swing
-      ) * 0.12;
-
-
-    this.rightShin.rotation.x =
-      Math.max(
-        0,
-        -swing
-      ) * 0.12;
-
-
-    if (
-      !walking
-    ) {
-
-      this.leftArm.rotation.z =
-        0.15;
-
-
-      this.rightArm.rotation.z =
-        -0.15;
-
-    }
-
-  }
-
-
-  /* ==========================================================
-     HIT ANIMATION
-     ========================================================== */
-
-  animateHit() {
-
-    this.torso.rotation.z =
-      0.18 *
-      this.facing;
-
-
-    this.leftArm.rotation.z =
-      0.45;
-
-
-    this.rightArm.rotation.z =
-      -0.45;
-
-  }
-
-
-  /* ==========================================================
-     FACE OPPONENT
-     ========================================================== */
-
-  faceOpponent(
-    opponent
-  ) {
-
-    if (
-      this.attacking
-    ) {
-
-      return;
-
-    }
-
-
-    this.facing =
-      opponent.group.position.x >
-      this.group.position.x
-        ? 1
-        : -1;
-
-
-    this.group.rotation.y =
-      this.facing === 1
-        ? 0
-        : Math.PI;
 
   }
 
@@ -2882,16 +2764,26 @@ class Fighter {
      ARENA LIMIT
      ========================================================== */
 
-  limitPosition() {
+  limit() {
 
     this.group.position.x =
       THREE.MathUtils.clamp(
 
         this.group.position.x,
 
-        -ARENA_LIMIT,
+        -ARENA_X,
+        ARENA_X
 
-        ARENA_LIMIT
+      );
+
+
+    this.group.position.z =
+      THREE.MathUtils.clamp(
+
+        this.group.position.z,
+
+        -ARENA_Z,
+        ARENA_Z
 
       );
 
@@ -2901,37 +2793,19 @@ class Fighter {
 
 
 /* ============================================================
-   CREATE FIGHTERS
+   CREATE BOTH FIGHTERS
    ============================================================ */
-
-/*
-   THIS IS WHERE WE WILL EVENTUALLY
-   CREATE DIFFERENT CHARACTERS.
-
-   Example:
-
-   new Fighter(
-      "CHARACTER NAME",
-      suit color,
-      accent color,
-      player controlled,
-      skin color
-   );
-*/
-
 
 const player =
   new Fighter(
 
     "IRON FURY",
 
-    0x263b46,
+    0x1d4053,
 
     0x28d7ff,
 
-    true,
-
-    0xc88968
+    true
 
   );
 
@@ -2945,9 +2819,7 @@ const enemy =
 
     0xff4057,
 
-    false,
-
-    0x9f624c
+    false
 
   );
 
@@ -2976,6 +2848,7 @@ function gainFury(
 ) {
 
   fighter.fury =
+
     Math.min(
 
       MAX_FURY,
@@ -2987,7 +2860,7 @@ function gainFury(
           (
             damage >= 8
               ? 0.16
-              : 0.1
+              : 0.10
           )
         ) *
         10
@@ -3000,39 +2873,102 @@ function gainFury(
 
 
 /* ============================================================
+   COMBO DISPLAY
+   ============================================================ */
+
+function showCombo(
+  number
+) {
+
+  comboNumber.textContent =
+    number;
+
+
+  comboCounter.classList.add(
+    "visible"
+  );
+
+}
+
+
+/* ============================================================
+   DAMAGE DISPLAY
+   ============================================================ */
+
+function showDamage(
+  amount
+) {
+
+  damageNumber.textContent =
+    Math.round(amount);
+
+
+  damageNumber.classList.remove(
+    "show"
+  );
+
+
+  void damageNumber.offsetWidth;
+
+
+  damageNumber.classList.add(
+    "show"
+  );
+
+
+  damageFlash.classList.remove(
+    "active"
+  );
+
+
+  void damageFlash.offsetWidth;
+
+
+  damageFlash.classList.add(
+    "active"
+  );
+
+}
+
+
+/* ============================================================
    PLAYER UPDATE
    ============================================================ */
 
-function updatePlayer() {
+function updatePlayer(dt) {
 
-  let direction =
-    0;
-
-
-  if (
-    stick.x < -0.2 ||
-    input.left
-  ) {
-
-    direction -=
-      1;
-
-  }
+  let x =
+    stick.x +
+    (input.right ? 1 : 0) -
+    (input.left ? 1 : 0);
 
 
-  if (
-    stick.x > 0.2 ||
-    input.right
-  ) {
+  let z =
+    -stick.y +
+    (input.down ? 1 : 0) -
+    (input.up ? 1 : 0);
 
-    direction +=
-      1;
 
-  }
+  x =
+    THREE.MathUtils.clamp(
+      x,
+      -1,
+      1
+    );
+
+
+  z =
+    THREE.MathUtils.clamp(
+      z,
+      -1,
+      1
+    );
 
 
   player.move(
-    direction
+    x,
+    z,
+    dt
   );
 
 }
@@ -3046,9 +2982,7 @@ let aiTimer =
   0;
 
 
-function updateEnemy(
-  dt
-) {
+function updateEnemy(dt) {
 
   aiTimer -=
     dt;
@@ -3064,49 +2998,58 @@ function updateEnemy(
 
 
   aiTimer =
-    0.15 +
+    0.16 +
     Math.random() *
-    0.2;
+    0.25;
 
 
-  const distance =
+  const dx =
     player.group.position.x -
     enemy.group.position.x;
 
 
-  const absolute =
-    Math.abs(
-      distance
+  const dz =
+    player.group.position.z -
+    enemy.group.position.z;
+
+
+  const distance =
+    Math.hypot(
+      dx,
+      dz
     );
 
 
   if (
-    absolute > 2.1
+    distance > 2.15
   ) {
 
     enemy.move(
-      Math.sign(
-        distance
-      )
+      dx,
+      dz,
+      dt * 2.1
     );
-
 
     return;
 
   }
 
 
-  enemy.move(
-    0
-  );
-
-
-  const choice =
+  const random =
     Math.random();
 
 
   if (
-    choice < 0.35
+    enemy.fury >= 1 &&
+    random < 0.14
+  ) {
+
+    enemy.useFury();
+
+  }
+
+  else if (
+    random < 0.46
   ) {
 
     enemy.startAttack(
@@ -3116,7 +3059,7 @@ function updateEnemy(
   }
 
   else if (
-    choice < 0.55
+    random < 0.72
   ) {
 
     enemy.startAttack(
@@ -3125,14 +3068,18 @@ function updateEnemy(
 
   }
 
-  else if (
-    choice < 0.72
-  ) {
+  else {
 
     enemy.block(
       true
     );
 
+  }
+
+
+  if (
+    enemy.blocking
+  ) {
 
     setTimeout(
       () => {
@@ -3142,16 +3089,8 @@ function updateEnemy(
         );
 
       },
-      350
+      300
     );
-
-  }
-
-  else if (
-    enemy.fury >= 1
-  ) {
-
-    enemy.useFury();
 
   }
 
@@ -3165,19 +3104,21 @@ function updateEnemy(
 function updateCamera() {
 
   const center =
-    (
-      player.group.position.x +
-      enemy.group.position.x
-    ) / 2;
+    player.group.position
+      .clone()
+      .add(
+        enemy.group.position
+      )
+      .multiplyScalar(
+        0.5
+      );
 
 
   const distance =
-    Math.abs(
-
-      player.group.position.x -
-      enemy.group.position.x
-
-    );
+    player.group.position
+      .distanceTo(
+        enemy.group.position
+      );
 
 
   const targetZ =
@@ -3185,24 +3126,21 @@ function updateCamera() {
 
       12 +
       distance *
-      0.35,
+      0.45,
 
-      11,
+      11.5,
       16
 
     );
 
 
-  let shakeX =
-    0;
-
-
-  let shakeY =
-    0;
+  let shakeX = 0;
+  let shakeY = 0;
 
 
   if (
-    game.cameraShake > 0
+    game.cameraShake >
+    0.01
   ) {
 
     shakeX =
@@ -3222,14 +3160,14 @@ function updateCamera() {
 
 
     game.cameraShake *=
-      0.88;
+      0.86;
 
   }
 
 
   camera.position.x +=
     (
-      center +
+      center.x +
       shakeX -
       camera.position.x
     ) *
@@ -3238,7 +3176,8 @@ function updateCamera() {
 
   camera.position.y +=
     (
-      4.7 +
+      5.1 +
+      center.y +
       shakeY -
       camera.position.y
     ) *
@@ -3254,8 +3193,8 @@ function updateCamera() {
 
 
   camera.lookAt(
-    center,
-    2.2,
+    center.x,
+    2.25,
     0
   );
 
@@ -3326,78 +3265,8 @@ function updateHUD() {
     " / 3";
 
 
-  const playerFury =
-    Math.floor(
-      player.fury
-    );
-
-
-  const enemyFury =
-    Math.floor(
-      enemy.fury
-    );
-
-
-  [
-    fury1,
-    fury2,
-    fury3
-  ].forEach(
-    (slot, index) => {
-
-      slot.classList.toggle(
-        "active",
-        index <
-        playerFury
-      );
-
-
-      slot.classList.toggle(
-        "ready",
-        playerFury === 3
-      );
-
-    }
-  );
-
-
-  [
-    enemyFury1,
-    enemyFury2,
-    enemyFury3
-  ].forEach(
-    (slot, index) => {
-
-      slot.classList.toggle(
-        "active",
-        index <
-        enemyFury
-      );
-
-
-      slot.classList.toggle(
-        "ready",
-        enemyFury === 3
-      );
-
-    }
-  );
-
-
-  furyButton.classList.toggle(
-    "ready",
-    playerFury >= 1
-  );
-
-
-  comboNumber.textContent =
-    player.combo;
-
-
-  comboCounter.classList.toggle(
-    "visible",
-    player.combo > 0
-  );
+  roundNumber.textContent =
+    "ROUND 1";
 
 
   timer.textContent =
@@ -3408,100 +3277,145 @@ function updateHUD() {
       )
     );
 
+
+  [
+    fury1,
+    fury2,
+    fury3
+  ].forEach(
+
+    (element, index) => {
+
+      element.classList.toggle(
+
+        "active",
+
+        index <
+        Math.floor(
+          player.fury
+        )
+
+      );
+
+
+      element.classList.toggle(
+
+        "ready",
+
+        Math.floor(
+          player.fury
+        ) === 3
+
+      );
+
+    }
+
+  );
+
+
+  [
+    enemyFury1,
+    enemyFury2,
+    enemyFury3
+  ].forEach(
+
+    (element, index) => {
+
+      element.classList.toggle(
+
+        "active",
+
+        index <
+        Math.floor(
+          enemy.fury
+        )
+
+      );
+
+
+      element.classList.toggle(
+
+        "ready",
+
+        Math.floor(
+          enemy.fury
+        ) === 3
+
+      );
+
+    }
+
+  );
+
+
+  furyButton.classList.toggle(
+
+    "ready",
+
+    player.fury >= 1
+
+  );
+
+
+  comboCounter.classList.toggle(
+
+    "visible",
+
+    player.comboTimer > 0 &&
+    player.comboStep > 0
+
+  );
+
+
+  comboNumber.textContent =
+    player.comboStep;
+
 }
 
 
 /* ============================================================
-   DAMAGE UI
+   ROUND MESSAGE
    ============================================================ */
-
-function showDamage(
-  amount
-) {
-
-  damageNumber.textContent =
-    Math.round(
-      amount
-    );
-
-
-  damageNumber.classList.remove(
-    "show"
-  );
-
-
-  void damageNumber.offsetWidth;
-
-
-  damageNumber.classList.add(
-    "show"
-  );
-
-
-  damageFlash.classList.remove(
-    "active"
-  );
-
-
-  void damageFlash.offsetWidth;
-
-
-  damageFlash.classList.add(
-    "active"
-  );
-
-}
-
-
-/* ============================================================
-   MESSAGE
-   ============================================================ */
-
-let messageTimer =
-  null;
-
 
 function showMessage(
-  title,
-  subtitle = "",
-  duration = 1000
+  main,
+  sub,
+  milliseconds = 900
 ) {
 
   message.textContent =
-    title;
+    main;
 
 
   subMessage.textContent =
-    subtitle;
+    sub;
 
 
-  message.style.opacity =
-    "1";
-
-
-  subMessage.style.opacity =
-    "1";
-
-
-  clearTimeout(
-    messageTimer
+  message.classList.add(
+    "show"
   );
 
 
-  messageTimer =
-    setTimeout(
-      () => {
-
-        message.style.opacity =
-          "0";
+  subMessage.classList.add(
+    "show"
+  );
 
 
-        subMessage.style.opacity =
-          "0";
+  setTimeout(
+    () => {
 
-      },
-      duration
-    );
+      message.classList.remove(
+        "show"
+      );
+
+
+      subMessage.classList.remove(
+        "show"
+      );
+
+    },
+    milliseconds
+  );
 
 }
 
@@ -3535,15 +3449,12 @@ function checkWinner() {
 
 
     finishSubtitle.textContent =
-      "THE RIVAL HAS FALLEN";
-
-
-    return;
+      "THE RIVAL IS DOWN";
 
   }
 
 
-  if (
+  else if (
     player.health <= 0
   ) {
 
@@ -3562,7 +3473,9 @@ function checkWinner() {
    ============================================================ */
 
 finishButton.addEventListener(
+
   "click",
+
   () => {
 
     finishOverlay.classList.add(
@@ -3574,23 +3487,17 @@ finishButton.addEventListener(
       true;
 
 
-    particlesBurst(
+    burst(
 
-      new THREE.Vector3(
-
-        enemy.group.position.x,
-
-        2.5,
-
-        0
-
-      ),
+      enemy.group.position
+        .clone()
+        .setY(2.5),
 
       0x28d7ff,
 
-      50,
+      60,
 
-      1.8
+      8
 
     );
 
@@ -3598,7 +3505,7 @@ finishButton.addEventListener(
     showMessage(
       "FURY FINISH",
       "IRON FURY",
-      1500
+      1200
     );
 
 
@@ -3611,10 +3518,11 @@ finishButton.addEventListener(
         );
 
       },
-      1200
+      900
     );
 
   }
+
 );
 
 
@@ -3663,108 +3571,6 @@ function endGame(
 
 
 /* ============================================================
-   RESET FIGHTER
-   ============================================================ */
-
-function resetFighter(
-  fighter,
-  x
-) {
-
-  fighter.health =
-    MAX_HEALTH;
-
-
-  fighter.vitality =
-    MAX_VITALITY;
-
-
-  fighter.fury =
-    0;
-
-
-  fighter.combo =
-    0;
-
-
-  fighter.comboTimer =
-    0;
-
-
-  fighter.furyUsed =
-    0;
-
-
-  fighter.damageDone =
-    0;
-
-
-  fighter.attacking =
-    false;
-
-
-  fighter.attack =
-    null;
-
-
-  fighter.attackTime =
-    0;
-
-
-  fighter.blocking =
-    false;
-
-
-  fighter.hitStun =
-    0;
-
-
-  fighter.dashTime =
-    0;
-
-
-  fighter.invincible =
-    false;
-
-
-  fighter.moveInput =
-    0;
-
-
-  fighter.moveVelocity =
-    0;
-
-
-  fighter.velocity.set(
-    0,
-    0,
-    0
-  );
-
-
-  fighter.grounded =
-    true;
-
-
-  fighter.group.position.set(
-    x,
-    0,
-    0
-  );
-
-
-  fighter.group.rotation.y =
-    fighter.playerControlled
-      ? 0
-      : Math.PI;
-
-
-  fighter.resetPose();
-
-}
-
-
-/* ============================================================
    RESTART
    ============================================================ */
 
@@ -3786,10 +3592,6 @@ function restartGame() {
     ROUND_TIME;
 
 
-  game.round =
-    1;
-
-
   game.maxCombo =
     0;
 
@@ -3802,15 +3604,109 @@ function restartGame() {
     0;
 
 
-  resetFighter(
-    player,
-    -3.8
+  aiTimer =
+    0;
+
+
+  for (
+    const fighter of
+    [player, enemy]
+  ) {
+
+    fighter.health =
+      MAX_HEALTH;
+
+
+    fighter.vitality =
+      MAX_VITALITY;
+
+
+    fighter.fury =
+      0;
+
+
+    fighter.damageDone =
+      0;
+
+
+    fighter.furyUsed =
+      0;
+
+
+    fighter.grounded =
+      true;
+
+
+    fighter.velocity.set(
+      0,
+      0,
+      0
+    );
+
+
+    fighter.blocking =
+      false;
+
+
+    fighter.attacking =
+      false;
+
+
+    fighter.attack =
+      null;
+
+
+    fighter.attackTime =
+      0;
+
+
+    fighter.hitStun =
+      0;
+
+
+    fighter.dashTime =
+      0;
+
+
+    fighter.invincible =
+      false;
+
+
+    fighter.comboStep =
+      0;
+
+
+    fighter.comboTimer =
+      0;
+
+
+    fighter.queuedAttack =
+      null;
+
+
+    fighter.group.rotation.set(
+      0,
+      0,
+      0
+    );
+
+
+    fighter.resetPose();
+
+  }
+
+
+  player.group.position.set(
+    -3.8,
+    0,
+    0
   );
 
 
-  resetFighter(
-    enemy,
-    3.8
+  enemy.group.position.set(
+    3.8,
+    0,
+    0
   );
 
 
@@ -3829,13 +3725,16 @@ function restartGame() {
   );
 
 
+  resetStick();
+
+
   updateHUD();
 
 
   showMessage(
     "ROUND 1",
     "FIGHT",
-    1200
+    1100
   );
 
 }
@@ -3846,7 +3745,7 @@ function restartGame() {
    ============================================================ */
 
 function setPaused(
-  paused
+  value
 ) {
 
   if (
@@ -3859,12 +3758,12 @@ function setPaused(
 
 
   game.paused =
-    paused;
+    value;
 
 
   pauseMenu.classList.toggle(
     "hidden",
-    !paused
+    !value
   );
 
 }
@@ -3910,48 +3809,18 @@ restartButton.addEventListener(
    MOBILE BUTTONS
    ============================================================ */
 
-function pressButton(
+function bindPress(
   element,
   down,
   up = () => {}
 ) {
 
-  element.addEventListener(
-    "pointerdown",
-    event => {
-
-      event.preventDefault();
-
-
-      element.setPointerCapture?.(
-        event.pointerId
-      );
-
-
-      element.classList.add(
-        "pressed"
-      );
-
-
-      down();
-
-    },
-    {
-      passive: false
-    }
-  );
-
-
   const release =
-    event => {
-
-      event.preventDefault?.();
-
+    () => {
 
       element.classList.remove(
         "pressed"
       );
-
 
       up();
 
@@ -3959,76 +3828,97 @@ function pressButton(
 
 
   element.addEventListener(
-    "pointerup",
-    release,
+
+    "pointerdown",
+
+    (event) => {
+
+      event.preventDefault();
+
+      element.setPointerCapture?.(
+        event.pointerId
+      );
+
+      element.classList.add(
+        "pressed"
+      );
+
+      down();
+
+    },
+
     {
       passive: false
     }
+
+  );
+
+
+  element.addEventListener(
+
+    "pointerup",
+
+    (event) => {
+
+      event.preventDefault();
+
+      release();
+
+    },
+
+    {
+      passive: false
+    }
+
   );
 
 
   element.addEventListener(
     "pointercancel",
-    release,
-    {
-      passive: false
-    }
+    release
   );
 
 
   element.addEventListener(
     "lostpointercapture",
-    () => {
-
-      element.classList.remove(
-        "pressed"
-      );
-
-
-      up();
-
-    }
+    release
   );
 
 }
 
 
-pressButton(
+bindPress(
   jumpButton,
   () => player.jump()
 );
 
 
-pressButton(
+bindPress(
   dashButton,
   () => player.dash()
 );
 
 
-pressButton(
+bindPress(
   punchButton,
-  () => player.startAttack(
-    "punch"
-  )
+  () => player.startAttack("punch")
 );
 
 
-pressButton(
+bindPress(
   kickButton,
-  () => player.startAttack(
-    "kick"
-  )
+  () => player.startAttack("kick")
 );
 
 
-pressButton(
+bindPress(
   blockButton,
   () => player.block(true),
   () => player.block(false)
 );
 
 
-pressButton(
+bindPress(
   furyButton,
   () => player.useFury()
 );
@@ -4039,8 +3929,29 @@ pressButton(
    ============================================================ */
 
 window.addEventListener(
+
   "keydown",
-  event => {
+
+  (event) => {
+
+    if (
+
+      [
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Space"
+      ].includes(
+        event.code
+      )
+
+    ) {
+
+      event.preventDefault();
+
+    }
+
 
     if (
       event.code === "ArrowLeft" ||
@@ -4065,8 +3976,38 @@ window.addEventListener(
 
 
     if (
-      event.code === "Space" &&
-      !event.repeat
+      event.code === "ArrowUp" ||
+      event.code === "KeyW"
+    ) {
+
+      input.up =
+        true;
+
+    }
+
+
+    if (
+      event.code === "ArrowDown" ||
+      event.code === "KeyS"
+    ) {
+
+      input.down =
+        true;
+
+    }
+
+
+    if (
+      event.repeat
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      event.code === "Space"
     ) {
 
       player.jump();
@@ -4075,8 +4016,7 @@ window.addEventListener(
 
 
     if (
-      event.code === "ShiftLeft" &&
-      !event.repeat
+      event.code === "ShiftLeft"
     ) {
 
       player.dash();
@@ -4085,8 +4025,7 @@ window.addEventListener(
 
 
     if (
-      event.code === "KeyJ" &&
-      !event.repeat
+      event.code === "KeyJ"
     ) {
 
       player.startAttack(
@@ -4097,8 +4036,7 @@ window.addEventListener(
 
 
     if (
-      event.code === "KeyK" &&
-      !event.repeat
+      event.code === "KeyK"
     ) {
 
       player.startAttack(
@@ -4120,8 +4058,7 @@ window.addEventListener(
 
 
     if (
-      event.code === "KeyF" &&
-      !event.repeat
+      event.code === "KeyF"
     ) {
 
       player.useFury();
@@ -4130,8 +4067,7 @@ window.addEventListener(
 
 
     if (
-      event.code === "Escape" &&
-      !event.repeat
+      event.code === "Escape"
     ) {
 
       setPaused(
@@ -4140,13 +4076,20 @@ window.addEventListener(
 
     }
 
+  },
+
+  {
+    passive: false
   }
+
 );
 
 
 window.addEventListener(
+
   "keyup",
-  event => {
+
+  (event) => {
 
     if (
       event.code === "ArrowLeft" ||
@@ -4171,6 +4114,28 @@ window.addEventListener(
 
 
     if (
+      event.code === "ArrowUp" ||
+      event.code === "KeyW"
+    ) {
+
+      input.up =
+        false;
+
+    }
+
+
+    if (
+      event.code === "ArrowDown" ||
+      event.code === "KeyS"
+    ) {
+
+      input.down =
+        false;
+
+    }
+
+
+    if (
       event.code === "KeyL"
     ) {
 
@@ -4181,6 +4146,7 @@ window.addEventListener(
     }
 
   }
+
 );
 
 
@@ -4258,11 +4224,18 @@ function updateStick(
 
 
   joystickKnob.style.transform =
-    "translate(calc(-50% + " +
+
+    "translate(" +
+
+    "calc(-50% + " +
     dx +
-    "px), calc(-50% + " +
+    "px), " +
+
+    "calc(-50% + " +
     dy +
-    "px))";
+    "px)" +
+
+    ")";
 
 }
 
@@ -4288,8 +4261,10 @@ function resetStick() {
 
 
 joystick.addEventListener(
+
   "pointerdown",
-  event => {
+
+  (event) => {
 
     event.preventDefault();
 
@@ -4298,7 +4273,7 @@ joystick.addEventListener(
       true;
 
 
-    joystick.setPointerCapture(
+    joystick.setPointerCapture?.(
       event.pointerId
     );
 
@@ -4309,15 +4284,19 @@ joystick.addEventListener(
     );
 
   },
+
   {
     passive: false
   }
+
 );
 
 
 joystick.addEventListener(
+
   "pointermove",
-  event => {
+
+  (event) => {
 
     if (
       !stick.active
@@ -4337,9 +4316,11 @@ joystick.addEventListener(
     );
 
   },
+
   {
     passive: false
   }
+
 );
 
 
@@ -4374,8 +4355,7 @@ function updateTimer(
 
 
   if (
-    game.time <=
-    0
+    game.time <= 0
   ) {
 
     game.time =
@@ -4413,7 +4393,9 @@ function updateTimer(
    ============================================================ */
 
 window.addEventListener(
+
   "resize",
+
   () => {
 
     camera.aspect =
@@ -4440,6 +4422,7 @@ window.addEventListener(
     );
 
   }
+
 );
 
 
@@ -4484,7 +4467,9 @@ function loop(
     !game.ended
   ) {
 
-    updatePlayer();
+    updatePlayer(
+      dt
+    );
 
 
     updateEnemy(
@@ -4537,7 +4522,7 @@ function loop(
 function initialize() {
 
   loadingText.textContent =
-    "INITIALIZING ENGINE";
+    "BUILDING ARENA";
 
 
   let progress =
@@ -4546,50 +4531,11 @@ function initialize() {
 
   const interval =
     setInterval(
+
       () => {
 
         progress +=
-          10;
-
-
-        if (
-          progress >= 30
-        ) {
-
-          loadingText.textContent =
-            "BUILDING 3D ARENA";
-
-        }
-
-
-        if (
-          progress >= 55
-        ) {
-
-          loadingText.textContent =
-            "BUILDING FIGHTER MODELS";
-
-        }
-
-
-        if (
-          progress >= 75
-        ) {
-
-          loadingText.textContent =
-            "ARMING COMBAT SYSTEM";
-
-        }
-
-
-        if (
-          progress >= 90
-        ) {
-
-          loadingText.textContent =
-            "CALIBRATING MOVEMENT";
-
-        }
+          20;
 
 
         loadingProgress.style.width =
@@ -4598,8 +4544,33 @@ function initialize() {
 
 
         if (
-          progress >= 100
+          progress < 40
         ) {
+
+          loadingText.textContent =
+            "BUILDING ARENA";
+
+        }
+
+        else if (
+          progress < 70
+        ) {
+
+          loadingText.textContent =
+            "CREATING FIGHTERS";
+
+        }
+
+        else if (
+          progress < 100
+        ) {
+
+          loadingText.textContent =
+            "ARMING COMBOS";
+
+        }
+
+        else {
 
           clearInterval(
             interval
@@ -4611,6 +4582,7 @@ function initialize() {
 
 
           setTimeout(
+
             () => {
 
               loadingScreen.classList.add(
@@ -4621,13 +4593,17 @@ function initialize() {
               restartGame();
 
             },
-            350
+
+            250
+
           );
 
         }
 
       },
-      70
+
+      80
+
     );
 
 }
@@ -4641,31 +4617,23 @@ try {
 
   updateHUD();
 
-
-  loop(
-    performance.now()
+  requestAnimationFrame(
+    loop
   );
-
 
   initialize();
 
 }
 
-catch (
-  error
-) {
+catch (error) {
 
   console.error(
-    "IRON FURY STARTUP ERROR:",
+    "IRON FURY ERROR:",
     error
   );
 
 
   loadingText.textContent =
-    "ENGINE ERROR";
-
-
-  loadingProgress.style.width =
-    "100%";
+    "ENGINE ERROR - CHECK CONSOLE";
 
 }
