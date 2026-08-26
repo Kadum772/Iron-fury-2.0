@@ -2,489 +2,176 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
-  <title>Iron Fury</title>
+  <title>IRON FURY</title>
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- ==============================
-       LOADING SCREEN
-       ============================== -->
+  <!-- GAME -->
+  <canvas id="gameCanvas"></canvas>
 
-  <div id="loadingScreen" class="loading-screen">
+  <!-- LOADING -->
+  <div id="loadingScreen">
+    <div class="loadingBox">
+      <div class="logo">IRON FURY</div>
+      <div id="loadingText">INITIALIZING</div>
+      <div class="loadingBar">
+        <div id="loadingProgress"></div>
+      </div>
+    </div>
+  </div>
 
-    <div class="loading-box">
+  <!-- HUD -->
+  <div id="hud">
 
-      <div class="loading-logo">
-        IRON FURY
+    <div class="fighterHud playerHud">
+      <div class="name">IRON FURY</div>
+
+      <div class="bar healthBar">
+        <div id="playerHealth"></div>
       </div>
 
-      <div
-        id="loadingText"
-        class="loading-text"
-      >
-        INITIALIZING ENGINE
+      <span id="playerHealthText">100</span>
+
+      <div class="bar vitalityBar">
+        <div id="playerVitality"></div>
       </div>
 
-      <div class="loading-track">
-        <div
-          id="loadingProgress"
-          class="loading-progress"
-        ></div>
+      <span id="playerVitalityText">100</span>
+
+      <div class="fury">
+        <span id="fury1"></span>
+        <span id="fury2"></span>
+        <span id="fury3"></span>
       </div>
+
+      <div id="playerFuryText">0 / 3</div>
+    </div>
+
+
+    <div class="centerHud">
+
+      <div class="round">ROUND <span id="roundNumber">1</span></div>
+
+      <div id="timer">60</div>
+
+      <div id="comboCounter">
+        <span id="comboNumber">0</span>
+        <small>HIT COMBO</small>
+      </div>
+
+    </div>
+
+
+    <div class="fighterHud enemyHud">
+      <div class="name">RIVAL</div>
+
+      <div class="bar healthBar">
+        <div id="enemyHealth"></div>
+      </div>
+
+      <span id="enemyHealthText">100</span>
+
+      <div class="bar vitalityBar">
+        <div id="enemyVitality"></div>
+      </div>
+
+      <span id="enemyVitalityText">100</span>
+
+      <div class="fury">
+        <span id="enemyFury1"></span>
+        <span id="enemyFury2"></span>
+        <span id="enemyFury3"></span>
+      </div>
+
+      <div id="enemyFuryText">0 / 3</div>
+    </div>
+
+  </div>
+
+
+  <!-- MESSAGES -->
+  <div id="messageBox">
+    <div id="message"></div>
+    <div id="subMessage"></div>
+  </div>
+
+  <div id="damageFlash"></div>
+  <div id="furyFlash"></div>
+
+  <div id="damageNumber">0</div>
+
+
+  <!-- PAUSE -->
+  <button id="pauseButton">Ⅱ</button>
+
+  <div id="pauseMenu" class="overlay hidden">
+    <div class="menuBox">
+      <h1>PAUSED</h1>
+      <button id="resumeButton">RESUME</button>
+      <button id="pauseRestartButton">RESTART</button>
+    </div>
+  </div>
+
+
+  <!-- RESULT -->
+  <div id="resultOverlay" class="overlay hidden">
+    <div class="menuBox">
+
+      <h1 id="resultTitle">VICTORY</h1>
+
+      <p id="resultDescription"></p>
+
+      <div class="results">
+        <div>MAX COMBO <b id="resultCombo">0</b></div>
+        <div>DAMAGE <b id="resultDamage">0</b></div>
+        <div>FURY <b id="resultFury">0</b></div>
+      </div>
+
+      <button id="restartButton">FIGHT AGAIN</button>
+
+    </div>
+  </div>
+
+
+  <!-- FURY FINISH -->
+  <div id="finishOverlay" class="overlay hidden">
+    <div class="menuBox finishBox">
+      <h1 id="finishTitle">FURY FINISH</h1>
+      <p id="finishSubtitle">THE RIVAL HAS FALLEN</p>
+      <button id="finishButton">FINISH</button>
+    </div>
+  </div>
+
+
+  <!-- MOBILE CONTROLS -->
+  <div id="mobileControls">
+
+    <div id="joystick">
+      <div id="joystickKnob"></div>
+    </div>
+
+    <div id="actionButtons">
+
+      <button id="jumpButton" class="action jump">JUMP</button>
+      <button id="dashButton" class="action dash">DASH</button>
+      <button id="punchButton" class="action punch">P</button>
+      <button id="kickButton" class="action kick">K</button>
+      <button id="blockButton" class="action block">B</button>
+      <button id="furyButton" class="action fury">FURY</button>
 
     </div>
 
   </div>
 
 
-  <!-- ==============================
-       GAME
-       ============================== -->
-
-  <main id="game">
-
-    <canvas id="gameCanvas"></canvas>
-
-
-    <!-- ============================
-         TOP HUD
-         ============================ -->
-
-    <section class="hud">
-
-      <!-- PLAYER -->
-
-      <div class="fighter-hud player-hud">
-
-        <div class="fighter-name">
-          IRON FURY
-        </div>
-
-        <div class="bar-row">
-
-          <div class="bar health-bar">
-            <div
-              id="playerHealth"
-              class="bar-fill"
-            ></div>
-          </div>
-
-          <span id="playerHealthText">
-            100
-          </span>
-
-        </div>
-
-        <div class="bar-row">
-
-          <div class="bar vitality-bar">
-            <div
-              id="playerVitality"
-              class="bar-fill"
-            ></div>
-          </div>
-
-          <span id="playerVitalityText">
-            100
-          </span>
-
-        </div>
-
-        <div class="fury-row">
-
-          <span class="fury-label">
-            FURY
-          </span>
-
-          <div class="fury-slots">
-
-            <span id="fury1" class="fury-slot"></span>
-            <span id="fury2" class="fury-slot"></span>
-            <span id="fury3" class="fury-slot"></span>
-
-          </div>
-
-          <span id="playerFuryText">
-            0 / 3
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- TIMER -->
-
-      <div class="round-hud">
-
-        <div class="round-label">
-          ROUND <span id="roundNumber">1</span>
-        </div>
-
-        <div
-          id="timer"
-          class="timer"
-        >
-          60
-        </div>
-
-      </div>
-
-
-      <!-- ENEMY -->
-
-      <div class="fighter-hud enemy-hud">
-
-        <div class="fighter-name">
-          RIVAL
-        </div>
-
-        <div class="bar-row">
-
-          <span id="enemyHealthText">
-            100
-          </span>
-
-          <div class="bar health-bar">
-            <div
-              id="enemyHealth"
-              class="bar-fill"
-            ></div>
-          </div>
-
-        </div>
-
-        <div class="bar-row">
-
-          <span id="enemyVitalityText">
-            100
-          </span>
-
-          <div class="bar vitality-bar">
-            <div
-              id="enemyVitality"
-              class="bar-fill"
-            ></div>
-          </div>
-
-        </div>
-
-        <div class="fury-row enemy-fury-row">
-
-          <span id="enemyFuryText">
-            0 / 3
-          </span>
-
-          <div class="fury-slots">
-
-            <span
-              id="enemyFury1"
-              class="fury-slot"
-            ></span>
-
-            <span
-              id="enemyFury2"
-              class="fury-slot"
-            ></span>
-
-            <span
-              id="enemyFury3"
-              class="fury-slot"
-            ></span>
-
-          </div>
-
-          <span class="fury-label">
-            FURY
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ============================
-         CENTER MESSAGES
-         ============================ -->
-
-    <div class="center-message">
-
-      <div
-        id="message"
-        class="message"
-      >
-        IRON FURY
-      </div>
-
-      <div
-        id="subMessage"
-        class="sub-message"
-      >
-        FIGHT
-      </div>
-
-    </div>
-
-
-    <!-- ============================
-         COMBO
-         ============================ -->
-
-    <div
-      id="comboCounter"
-      class="combo-counter"
-    >
-      <strong id="comboNumber">0</strong>
-      <span>HIT COMBO</span>
-    </div>
-
-
-    <!-- ============================
-         DAMAGE
-         ============================ -->
-
-    <div
-      id="damageFlash"
-      class="damage-flash"
-    ></div>
-
-    <div
-      id="furyFlash"
-      class="fury-flash"
-    ></div>
-
-    <div
-      id="damageNumber"
-      class="damage-number"
-    >
-      0
-    </div>
-
-
-    <!-- ============================
-         PAUSE
-         ============================ -->
-
-    <button
-      id="pauseButton"
-      class="pause-button"
-      type="button"
-    >
-      II
-    </button>
-
-
-    <!-- ============================
-         MOBILE CONTROLS
-         ============================ -->
-
-    <section class="mobile-controls">
-
-      <!-- JOYSTICK -->
-
-      <div
-        id="joystick"
-        class="joystick"
-      >
-
-        <div
-          id="joystickKnob"
-          class="joystick-knob"
-        ></div>
-
-      </div>
-
-
-      <!-- ACTION BUTTONS -->
-
-      <div class="action-buttons">
-
-        <button
-          id="jumpButton"
-          class="control-button jump"
-          type="button"
-        >
-          ↑
-        </button>
-
-        <button
-          id="dashButton"
-          class="control-button dash"
-          type="button"
-        >
-          D
-        </button>
-
-        <button
-          id="punchButton"
-          class="control-button punch"
-          type="button"
-        >
-          P
-        </button>
-
-        <button
-          id="kickButton"
-          class="control-button kick"
-          type="button"
-        >
-          K
-        </button>
-
-        <button
-          id="blockButton"
-          class="control-button block"
-          type="button"
-        >
-          B
-        </button>
-
-        <button
-          id="furyButton"
-          class="control-button fury"
-          type="button"
-        >
-          FURY
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- ============================
-         PAUSE MENU
-         ============================ -->
-
-    <div
-      id="pauseMenu"
-      class="overlay hidden"
-    >
-
-      <div class="overlay-box">
-
-        <h1>PAUSED</h1>
-
-        <button
-          id="resumeButton"
-          type="button"
-        >
-          RESUME
-        </button>
-
-        <button
-          id="pauseRestartButton"
-          type="button"
-        >
-          RESTART
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- ============================
-         FINISH SCREEN
-         ============================ -->
-
-    <div
-      id="finishOverlay"
-      class="overlay hidden"
-    >
-
-      <div class="overlay-box finish-box">
-
-        <h1 id="finishTitle">
-          FURY FINISH
-        </h1>
-
-        <p id="finishSubtitle">
-          THE RIVAL IS DEFEATED
-        </p>
-
-        <button
-          id="finishButton"
-          type="button"
-        >
-          FINISH
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- ============================
-         RESULT SCREEN
-         ============================ -->
-
-    <div
-      id="resultOverlay"
-      class="overlay hidden"
-    >
-
-      <div class="overlay-box">
-
-        <h1 id="resultTitle">
-          VICTORY
-        </h1>
-
-        <p id="resultDescription">
-          FIGHT COMPLETE
-        </p>
-
-        <div class="result-stats">
-
-          <div>
-            <span>MAX COMBO</span>
-            <strong id="resultCombo">0</strong>
-          </div>
-
-          <div>
-            <span>DAMAGE</span>
-            <strong id="resultDamage">0</strong>
-          </div>
-
-          <div>
-            <span>FURY USED</span>
-            <strong id="resultFury">0</strong>
-          </div>
-
-        </div>
-
-        <button
-          id="restartButton"
-          type="button"
-        >
-          FIGHT AGAIN
-        </button>
-
-      </div>
-
-    </div>
-
-  </main>
-
-
-  <!-- IMPORTANT:
-       Three.js is loaded BEFORE game.js.
-       game.js is loaded as a normal script. -->
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
-  ></script>
+  <!-- THREE.JS -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
   <script src="game.js"></script>
 
