@@ -448,45 +448,30 @@ function updateParticles(dt) {
 
 /* ============================================================
    FIGHTER CLASS
-============================================================ */
+========================================================================================================= */
 
-class Fighter {
+  class Fighter {
 
-  constructor(
-    name,
-    color,
-    accent,
-    playerControlled
-  ) {
+  constructor(name, color, accent, playerControlled) {
 
     this.name = name;
     this.color = color;
     this.accent = accent;
+    this.playerControlled = playerControlled;
 
-    this.playerControlled =
-      playerControlled;
+    this.group = new THREE.Group();
 
-    this.group =
-      new THREE.Group();
-
-    this.health =
-      MAX_HEALTH;
-
-    this.vitality =
-      MAX_VITALITY;
-
+    this.health = MAX_HEALTH;
+    this.vitality = MAX_VITALITY;
     this.fury = 0;
 
     this.combo = 0;
     this.comboTimer = 0;
 
     this.grounded = true;
+    this.velocity = new THREE.Vector3();
 
-    this.velocity =
-      new THREE.Vector3();
-
-    this.facing =
-      playerControlled ? 1 : -1;
+    this.facing = playerControlled ? 1 : -1;
 
     this.blocking = false;
 
@@ -503,8 +488,6 @@ class Fighter {
     this.damageDone = 0;
     this.furyUsed = 0;
 
-    this.walkTime = 0;
-
     this.createModel();
 
     scene.add(this.group);
@@ -512,139 +495,342 @@ class Fighter {
 
 
   /* ========================================================
-     SIMPLE 3D FIGHTER
-  ======================================================== */
+     FIGHTER MODEL
+     ======================================================== */
 
   createModel() {
 
-    const skin =
-      mat(0xc88968);
+    /* ---------- MATERIALS ---------- */
 
-    const suit =
-      mat(this.color, .35);
+    const skin = mat(0xc88968, 0.05);
 
-    const accent =
-      mat(this.accent, .5);
+    const suit = mat(
+      this.color,
+      0.45
+    );
 
-    const dark =
-      mat(0x11161b, .4);
+    const accent = mat(
+      this.accent,
+      0.65
+    );
+
+    const dark = mat(
+      0x111820,
+      0.65
+    );
+
+    const metal = mat(
+      0x66727c,
+      0.8
+    );
+
+    const black = mat(
+      0x05080b,
+      0.5
+    );
 
 
-    /* BODY */
+    /* ======================================================
+       MAIN BODY
+       ====================================================== */
 
-    this.body =
-      new THREE.Group();
+    this.body = new THREE.Group();
 
     this.group.add(this.body);
 
 
-    /* TORSO */
+    /* ======================================================
+       WAIST
+       ====================================================== */
 
-    this.torso =
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          1.05,
-          1.4,
-          .58
-        ),
-        suit
-      );
+    this.waist = new THREE.Mesh(
 
-    this.torso.position.y =
-      2.55;
+      new THREE.BoxGeometry(
+        0.82,
+        0.38,
+        0.56
+      ),
+
+      dark
+
+    );
+
+    this.waist.position.y = 1.82;
+
+    this.waist.castShadow = true;
+
+    this.body.add(this.waist);
+
+
+    /* ======================================================
+       TORSO
+       ====================================================== */
+
+    this.torso = new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        1.12,
+        1.35,
+        0.62
+      ),
+
+      suit
+
+    );
+
+    this.torso.position.y = 2.65;
 
     this.torso.castShadow = true;
 
     this.body.add(this.torso);
 
 
-    /* HEAD */
+    /* ======================================================
+       CHEST ARMOR
+       ====================================================== */
 
-    this.head =
-      new THREE.Mesh(
-        new THREE.SphereGeometry(
-          .42,
-          16,
-          12
-        ),
-        skin
-      );
+    this.chestArmor = new THREE.Mesh(
 
-    this.head.position.y =
-      3.75;
+      new THREE.BoxGeometry(
+        0.82,
+        0.55,
+        0.12
+      ),
+
+      accent
+
+    );
+
+    this.chestArmor.position.set(
+      0,
+      2.78,
+      0.37
+    );
+
+    this.chestArmor.castShadow = true;
+
+    this.body.add(this.chestArmor);
+
+
+    /* ======================================================
+       CHEST CORE
+       ====================================================== */
+
+    this.core = new THREE.Mesh(
+
+      new THREE.CylinderGeometry(
+        0.13,
+        0.13,
+        0.08,
+        16
+      ),
+
+      new THREE.MeshBasicMaterial({
+        color: this.accent
+      })
+
+    );
+
+    this.core.rotation.x =
+      Math.PI / 2;
+
+    this.core.position.set(
+      0,
+      2.78,
+      0.45
+    );
+
+    this.body.add(this.core);
+
+
+    /* ======================================================
+       NECK
+       ====================================================== */
+
+    this.neck = new THREE.Mesh(
+
+      new THREE.CylinderGeometry(
+        0.18,
+        0.21,
+        0.32,
+        10
+      ),
+
+      skin
+
+    );
+
+    this.neck.position.y = 3.45;
+
+    this.neck.castShadow = true;
+
+    this.body.add(this.neck);
+
+
+    /* ======================================================
+       HEAD
+       ====================================================== */
+
+    this.head = new THREE.Mesh(
+
+      new THREE.SphereGeometry(
+        0.43,
+        18,
+        14
+      ),
+
+      skin
+
+    );
+
+    this.head.position.y = 3.85;
 
     this.head.castShadow = true;
 
     this.body.add(this.head);
 
 
-    /* FACE VISOR */
+    /* ======================================================
+       HEAD ARMOR / HAIR
+       ====================================================== */
 
-    this.visor =
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .56,
-          .14,
-          .08
-        ),
-        dark
-      );
+    this.headArmor = new THREE.Mesh(
+
+      new THREE.SphereGeometry(
+        0.45,
+        18,
+        10,
+        0,
+        Math.PI * 2,
+        0,
+        Math.PI * 0.55
+      ),
+
+      dark
+
+    );
+
+    this.headArmor.position.y = 3.94;
+
+    this.headArmor.castShadow = true;
+
+    this.body.add(this.headArmor);
+
+
+    /* ======================================================
+       VISOR
+       ====================================================== */
+
+    this.visor = new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        0.58,
+        0.15,
+        0.08
+      ),
+
+      black
+
+    );
 
     this.visor.position.set(
       0,
-      3.77,
-      .39
+      3.86,
+      0.40
     );
 
     this.body.add(this.visor);
 
 
-    /* CHEST */
+    /* ======================================================
+       VISOR LIGHT
+       ====================================================== */
 
-    this.chest =
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .72,
-          .4,
-          .64
-        ),
-        accent
-      );
+    this.visorLight = new THREE.Mesh(
 
-    this.chest.position.set(
-      0,
-      2.78,
-      .3
+      new THREE.BoxGeometry(
+        0.38,
+        0.035,
+        0.025
+      ),
+
+      new THREE.MeshBasicMaterial({
+        color: this.accent
+      })
+
     );
 
-    this.body.add(this.chest);
+    this.visorLight.position.set(
+      0,
+      3.86,
+      0.445
+    );
+
+    this.body.add(this.visorLight);
 
 
-    /* ARMS */
+    /* ======================================================
+       SHOULDERS
+       ====================================================== */
 
-    this.leftArm =
-      this.limb(
-        .19,
-        .78,
-        suit
-      );
+    this.leftShoulder = new THREE.Mesh(
 
-    this.rightArm =
-      this.limb(
-        .19,
-        .78,
-        suit
-      );
+      new THREE.SphereGeometry(
+        0.28,
+        12,
+        10
+      ),
+
+      accent
+
+    );
+
+    this.rightShoulder =
+      this.leftShoulder.clone();
+
+    this.leftShoulder.position.set(
+      -0.72,
+      3.12,
+      0
+    );
+
+    this.rightShoulder.position.set(
+      0.72,
+      3.12,
+      0
+    );
+
+    this.body.add(
+      this.leftShoulder,
+      this.rightShoulder
+    );
+
+
+    /* ======================================================
+       ARMS
+       ====================================================== */
+
+    this.leftArm = this.limb(
+      0.19,
+      0.78,
+      suit
+    );
+
+    this.rightArm = this.limb(
+      0.19,
+      0.78,
+      suit
+    );
 
     this.leftArm.position.set(
-      -.68,
-      3.02,
+      -0.72,
+      3.05,
       0
     );
 
     this.rightArm.position.set(
-      .68,
-      3.02,
+      0.72,
+      3.05,
       0
     );
 
@@ -654,26 +840,61 @@ class Fighter {
     );
 
 
-    /* FISTS */
+    /* ======================================================
+       FOREARM ARMOR
+       ====================================================== */
 
-    this.leftFist =
-      new THREE.Mesh(
-        new THREE.SphereGeometry(
-          .2,
-          10,
-          8
-        ),
-        accent
-      );
+    this.leftGuard = new THREE.Mesh(
+
+      new THREE.CylinderGeometry(
+        0.22,
+        0.20,
+        0.42,
+        10
+      ),
+
+      metal
+
+    );
+
+    this.rightGuard =
+      this.leftGuard.clone();
+
+    this.leftGuard.position.y = -0.48;
+
+    this.rightGuard.position.y = -0.48;
+
+    this.leftArm.add(
+      this.leftGuard
+    );
+
+    this.rightArm.add(
+      this.rightGuard
+    );
+
+
+    /* ======================================================
+       FISTS / GLOVES
+       ====================================================== */
+
+    this.leftFist = new THREE.Mesh(
+
+      new THREE.SphereGeometry(
+        0.22,
+        12,
+        10
+      ),
+
+      accent
+
+    );
 
     this.rightFist =
       this.leftFist.clone();
 
-    this.leftFist.position.y =
-      -.5;
+    this.leftFist.position.y = -0.82;
 
-    this.rightFist.position.y =
-      -.5;
+    this.rightFist.position.y = -0.82;
 
     this.leftArm.add(
       this.leftFist
@@ -684,31 +905,79 @@ class Fighter {
     );
 
 
-    /* LEGS */
+    /* ======================================================
+       BELT
+       ====================================================== */
 
-    this.leftLeg =
-      this.limb(
-        .25,
-        1,
-        dark
-      );
+    this.belt = new THREE.Mesh(
 
-    this.rightLeg =
-      this.limb(
-        .25,
-        1,
-        dark
-      );
+      new THREE.BoxGeometry(
+        0.95,
+        0.18,
+        0.65
+      ),
+
+      dark
+
+    );
+
+    this.belt.position.y = 1.98;
+
+    this.body.add(this.belt);
+
+
+    /* ======================================================
+       BELT CORE
+       ====================================================== */
+
+    this.beltCore = new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        0.22,
+        0.20,
+        0.08
+      ),
+
+      accent
+
+    );
+
+    this.beltCore.position.set(
+      0,
+      1.98,
+      0.37
+    );
+
+    this.body.add(
+      this.beltCore
+    );
+
+
+    /* ======================================================
+       LEGS
+       ====================================================== */
+
+    this.leftLeg = this.limb(
+      0.27,
+      0.85,
+      dark
+    );
+
+    this.rightLeg = this.limb(
+      0.27,
+      0.85,
+      dark
+    );
 
     this.leftLeg.position.set(
-      -.3,
-      1.3,
+      -0.32,
+      1.55,
       0
     );
 
     this.rightLeg.position.set(
-      .3,
-      1.3,
+      0.32,
+      1.55,
       0
     );
 
@@ -718,31 +987,67 @@ class Fighter {
     );
 
 
-    /* FEET */
+    /* ======================================================
+       KNEE ARMOR
+       ====================================================== */
 
-    this.leftFoot =
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .34,
-          .2,
-          .58
-        ),
-        dark
-      );
+    this.leftKnee = new THREE.Mesh(
+
+      new THREE.SphereGeometry(
+        0.25,
+        10,
+        8
+      ),
+
+      metal
+
+    );
+
+    this.rightKnee =
+      this.leftKnee.clone();
+
+    this.leftKnee.position.y = -0.42;
+
+    this.rightKnee.position.y = -0.42;
+
+    this.leftLeg.add(
+      this.leftKnee
+    );
+
+    this.rightLeg.add(
+      this.rightKnee
+    );
+
+
+    /* ======================================================
+       BOOTS
+       ====================================================== */
+
+    this.leftFoot = new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        0.38,
+        0.24,
+        0.68
+      ),
+
+      black
+
+    );
 
     this.rightFoot =
       this.leftFoot.clone();
 
     this.leftFoot.position.set(
       0,
-      -.58,
-      .15
+      -0.58,
+      0.17
     );
 
     this.rightFoot.position.set(
       0,
-      -.58,
-      .15
+      -0.58,
+      0.17
     );
 
     this.leftLeg.add(
@@ -753,9 +1058,54 @@ class Fighter {
       this.rightFoot
     );
 
+
+    /* ======================================================
+       BOOT ACCENTS
+       ====================================================== */
+
+    this.leftBootAccent = new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        0.32,
+        0.07,
+        0.10
+      ),
+
+      accent
+
+    );
+
+    this.rightBootAccent =
+      this.leftBootAccent.clone();
+
+    this.leftBootAccent.position.set(
+      0,
+      -0.49,
+      0.49
+    );
+
+    this.rightBootAccent.position.set(
+      0,
+      -0.49,
+      0.49
+    );
+
+    this.leftLeg.add(
+      this.leftBootAccent
+    );
+
+    this.rightLeg.add(
+      this.rightBootAccent
+    );
+
+
     this.resetPose();
   }
 
+
+  /* ========================================================
+     LIMB
+     ======================================================== */
 
   limb(
     radius,
@@ -768,13 +1118,16 @@ class Fighter {
 
     const mesh =
       new THREE.Mesh(
+
         new THREE.CylinderGeometry(
           radius,
-          radius,
+          radius * 0.92,
           length,
           10
         ),
+
         material
+
       );
 
     mesh.position.y =
@@ -788,18 +1141,22 @@ class Fighter {
   }
 
 
+  /* ========================================================
+     RESET POSE
+     ======================================================== */
+
   resetPose() {
 
     this.leftArm.rotation.set(
-      .1,
+      0.1,
       0,
-      .15
+      0.15
     );
 
     this.rightArm.rotation.set(
-      .1,
+      0.1,
       0,
-      -.15
+      -0.15
     );
 
     this.leftLeg.rotation.set(
@@ -814,6 +1171,12 @@ class Fighter {
       0
     );
 
+    this.torso.rotation.set(
+      0,
+      0,
+      0
+    );
+
     this.body.scale.set(
       1,
       1,
@@ -823,383 +1186,8 @@ class Fighter {
 
 
   /* ========================================================
-     MOVEMENT
-  ======================================================== */
-
-  move(direction, dt) {
-
-    if (
-      this.attacking ||
-      this.blocking ||
-      this.hitStun > 0 ||
-      this.dashTime > 0
-    ) {
-      return;
-    }
-
-    const speed =
-      this.playerControlled
-        ? PLAYER_SPEED
-        : ENEMY_SPEED;
-
-    this.group.position.x +=
-      direction * speed * dt;
-
-    if (direction !== 0) {
-      this.walkTime += dt * 9;
-    }
-  }
-
-
-  jump() {
-
-    if (
-      !this.grounded ||
-      this.attacking ||
-      this.blocking ||
-      this.hitStun > 0
-    ) {
-      return;
-    }
-
-    this.velocity.y =
-      JUMP_FORCE;
-
-    this.grounded = false;
-  }
-
-
-  dash() {
-
-    if (
-      this.dashTime > 0 ||
-      this.hitStun > 0
-    ) {
-      return;
-    }
-
-    this.dashTime =
-      .18;
-
-    particlesBurst(
-      new THREE.Vector3(
-        this.group.position.x,
-        1,
-        0
-      ),
-      this.accent,
-      8
-    );
-  }
-
-
-  block(value) {
-
-    if (
-      this.attacking ||
-      this.hitStun > 0
-    ) {
-      this.blocking = false;
-      return;
-    }
-
-    this.blocking = value;
-  }
-
-
-  /* ========================================================
-     ATTACKS
-  ======================================================== */
-
-  startAttack(type) {
-
-    if (
-      this.attacking ||
-      this.blocking ||
-      this.hitStun > 0
-    ) {
-      return;
-    }
-
-    this.attacking = true;
-    this.attack = type;
-    this.hitConfirmed = false;
-
-    this.attackTime =
-      type === "punch"
-        ? .42
-        : type === "kick"
-          ? .55
-          : 1.15;
-  }
-
-
-  useFury() {
-
-    const level =
-      Math.floor(this.fury);
-
-    if (
-      level < 1 ||
-      this.attacking ||
-      this.blocking ||
-      this.hitStun > 0
-    ) {
-      return;
-    }
-
-    this.fury = 0;
-
-    this.furyUsed += level;
-
-    this.attacking = true;
-    this.attack = "fury";
-    this.attackTime = 1.15;
-    this.hitConfirmed = false;
-
-    furyFlash.classList.remove("active");
-
-    void furyFlash.offsetWidth;
-
-    furyFlash.classList.add("active");
-
-    particlesBurst(
-      new THREE.Vector3(
-        this.group.position.x,
-        2.5,
-        0
-      ),
-      this.accent,
-      35
-    );
-
-    updateHUD();
-  }
-
-
-  updateAttack(dt, opponent) {
-
-    this.attackTime -= dt;
-
-    const duration =
-      this.attack === "punch"
-        ? .42
-        : this.attack === "kick"
-          ? .55
-          : 1.15;
-
-    const progress =
-      1 -
-      this.attackTime /
-      duration;
-
-
-    if (
-      !this.hitConfirmed &&
-      progress > .3 &&
-      progress < .72
-    ) {
-
-      this.hitConfirmed = true;
-
-      const distance =
-        Math.abs(
-          opponent.group.position.x -
-          this.group.position.x
-        );
-
-      const range =
-        this.attack === "kick"
-          ? 2.05
-          : this.attack === "fury"
-            ? 3.2
-            : 1.7;
-
-      if (distance <= range) {
-
-        let damage;
-
-        if (this.attack === "punch") {
-          damage = 7;
-        }
-        else if (this.attack === "kick") {
-          damage = 10;
-        }
-        else {
-          damage = 15 + this.furyUsed * 8;
-        }
-
-        opponent.takeDamage(
-          damage,
-          this
-        );
-      }
-    }
-
-
-    if (this.attackTime <= 0) {
-
-      this.attacking = false;
-      this.attack = null;
-      this.attackTime = 0;
-
-      this.resetPose();
-    }
-  }
-
-
-  /* ========================================================
-     DAMAGE
-  ======================================================== */
-
-  takeDamage(damage, attacker) {
-
-    if (
-      this.invincible ||
-      game.ended
-    ) {
-      return;
-    }
-
-    let actual = damage;
-
-    if (this.blocking) {
-
-      actual *= .2;
-
-      this.vitality =
-        Math.max(
-          0,
-          this.vitality -
-          damage * .15
-        );
-
-    }
-    else {
-
-      this.vitality =
-        Math.max(
-          0,
-          this.vitality -
-          damage * .08
-        );
-
-      this.hitStun = .2;
-
-      this.velocity.x =
-        attacker.facing * 2;
-
-      this.comboTimer =
-        COMBO_TIME;
-    }
-
-
-    this.health =
-      Math.max(
-        0,
-        this.health - actual
-      );
-
-
-    attacker.damageDone += actual;
-
-
-    if (attacker.playerControlled) {
-
-      attacker.combo++;
-
-      attacker.comboTimer =
-        COMBO_TIME;
-
-      game.maxCombo =
-        Math.max(
-          game.maxCombo,
-          attacker.combo
-        );
-
-      game.totalDamage += actual;
-
-      gainFury(
-        attacker,
-        actual
-      );
-
-      showDamage(actual);
-    }
-
-
-    game.cameraShake =
-      Math.min(
-        .25,
-        game.cameraShake + .09
-      );
-
-
-    particlesBurst(
-      new THREE.Vector3(
-        this.group.position.x,
-        2.5,
-        .5
-      ),
-      this.blocking
-        ? 0xb76cff
-        : 0xffbf3d,
-      this.blocking
-        ? 7
-        : 12
-    );
-
-
-    updateHUD();
-
-
-    if (this.health <= 0) {
-
-      this.health = 0;
-
-      checkWinner();
-    }
-  }
-
-
-  /* ========================================================
-     PHYSICS
-  ======================================================== */
-
-  physics(dt) {
-
-    if (!this.grounded) {
-
-      this.velocity.y -=
-        GRAVITY * dt;
-
-      this.group.position.y +=
-        this.velocity.y * dt;
-
-      if (
-        this.group.position.y <= 0
-      ) {
-
-        this.group.position.y = 0;
-
-        this.velocity.y = 0;
-
-        this.grounded = true;
-      }
-    }
-
-    if (this.hitStun <= 0) {
-      this.velocity.x *= .8;
-    }
-
-    this.group.position.x +=
-      this.velocity.x * dt;
-  }
-
-
-  /* ========================================================
      UPDATE
-  ======================================================== */
+     ======================================================== */
 
   update(dt, opponent) {
 
@@ -1212,8 +1200,6 @@ class Fighter {
       this.physics(dt);
 
       this.animateHit();
-
-      this.limitPosition();
 
       return;
     }
@@ -1228,8 +1214,7 @@ class Fighter {
 
       this.invincible = true;
 
-    }
-    else {
+    } else {
 
       this.invincible = false;
     }
@@ -1246,7 +1231,9 @@ class Fighter {
 
     this.physics(dt);
 
-    this.faceOpponent(opponent);
+    this.faceOpponent(
+      opponent
+    );
 
     this.animate();
 
@@ -1256,84 +1243,569 @@ class Fighter {
     this.comboTimer -= dt;
 
     if (this.comboTimer <= 0) {
+
       this.combo = 0;
     }
   }
 
 
   /* ========================================================
-     ANIMATION
-  ======================================================== */
+     PHYSICS
+     ======================================================== */
 
-  animate() {
+  physics(dt) {
 
-    if (this.blocking) {
+    if (!this.grounded) {
 
-      this.leftArm.rotation.x = -.7;
-      this.rightArm.rotation.x = -.7;
+      this.velocity.y -=
+        GRAVITY * dt;
 
-      this.leftArm.rotation.z = .65;
-      this.rightArm.rotation.z = -.65;
+      this.group.position.y +=
+        this.velocity.y * dt;
+
+
+      if (
+        this.group.position.y <= 0
+      ) {
+
+        this.group.position.y = 0;
+
+        this.velocity.y = 0;
+
+        this.grounded = true;
+      }
+    }
+  }
+
+
+  /* ========================================================
+     MOVEMENT
+     ======================================================== */
+
+  move(direction, dt) {
+
+    if (
+      this.attacking ||
+      this.blocking ||
+      this.hitStun > 0 ||
+      this.dashTime > 0
+    ) {
 
       return;
     }
 
 
+    const speed =
+      this.playerControlled
+        ? PLAYER_SPEED
+        : ENEMY_SPEED;
+
+
+    this.group.position.x +=
+      direction * speed * dt;
+  }
+
+
+  /* ========================================================
+     JUMP
+     ======================================================== */
+
+  jump() {
+
+    if (
+      !this.grounded ||
+      this.attacking ||
+      this.blocking
+    ) {
+
+      return;
+    }
+
+
+    this.velocity.y =
+      JUMP_FORCE;
+
+    this.grounded = false;
+  }
+
+
+  /* ========================================================
+     DASH
+     ======================================================== */
+
+  dash() {
+
+    if (
+      this.dashTime > 0 ||
+      this.hitStun > 0
+    ) {
+
+      return;
+    }
+
+
+    this.dashTime = 0.18;
+
+    particlesBurst(
+
+      new THREE.Vector3(
+        this.group.position.x,
+        1,
+        0
+      ),
+
+      this.accent,
+
+      8
+    );
+  }
+
+
+  /* ========================================================
+     BLOCK
+     ======================================================== */
+
+  block(value) {
+
+    if (
+      this.attacking ||
+      this.hitStun > 0
+    ) {
+
+      this.blocking = false;
+
+      return;
+    }
+
+
+    this.blocking = value;
+  }
+
+
+  /* ========================================================
+     ATTACK
+     ======================================================== */
+
+  startAttack(type) {
+
+    if (
+      this.attacking ||
+      this.blocking ||
+      this.hitStun > 0
+    ) {
+
+      return;
+    }
+
+
+    this.attacking = true;
+
+    this.attack = type;
+
+    this.hitConfirmed = false;
+
+
+    this.attackTime =
+      type === "punch"
+        ? 0.42
+        : type === "kick"
+          ? 0.55
+          : 1.15;
+  }
+
+
+  updateAttack(
+    dt,
+    opponent
+  ) {
+
+    this.attackTime -= dt;
+
+
+    const duration =
+      this.attack === "punch"
+        ? 0.42
+        : this.attack === "kick"
+          ? 0.55
+          : 1.15;
+
+
+    const progress =
+      1 -
+      this.attackTime /
+        duration;
+
+
+    if (
+      !this.hitConfirmed &&
+      progress > 0.3 &&
+      progress < 0.72
+    ) {
+
+      this.hitConfirmed = true;
+
+
+      const distance =
+        Math.abs(
+          opponent.group.position.x -
+          this.group.position.x
+        );
+
+
+      const range =
+        this.attack === "kick"
+          ? 2.05
+          : this.attack === "fury"
+            ? 3.2
+            : 1.7;
+
+
+      if (
+        distance <= range
+      ) {
+
+        let damage = 0;
+
+
+        if (
+          this.attack === "punch"
+        ) {
+
+          damage = 7;
+
+        } else if (
+          this.attack === "kick"
+        ) {
+
+          damage = 10;
+
+        } else {
+
+          damage =
+            15 +
+            this.furyUsed * 8;
+        }
+
+
+        opponent.takeDamage(
+          damage,
+          this
+        );
+      }
+    }
+
+
+    if (
+      this.attackTime <= 0
+    ) {
+
+      this.attacking = false;
+
+      this.attack = null;
+
+      this.attackTime = 0;
+
+      this.body.scale.set(
+        1,
+        1,
+        1
+      );
+    }
+  }
+
+
+  /* ========================================================
+     DAMAGE
+     ======================================================== */
+
+  takeDamage(
+    damage,
+    attacker
+  ) {
+
+    if (
+      this.invincible ||
+      game.ended
+    ) {
+
+      return;
+    }
+
+
+    let actual = damage;
+
+
+    if (this.blocking) {
+
+      actual *= 0.2;
+
+      this.vitality =
+        Math.max(
+          0,
+          this.vitality -
+            damage * 0.15
+        );
+
+    } else {
+
+      this.vitality =
+        Math.max(
+          0,
+          this.vitality -
+            damage * 0.08
+        );
+
+
+      this.hitStun = 0.2;
+
+
+      this.velocity.x =
+        attacker.facing * 2;
+
+
+      this.comboTimer =
+        COMBO_TIME;
+    }
+
+
+    this.health =
+      Math.max(
+        0,
+        this.health - actual
+      );
+
+
+    attacker.damageDone += actual;
+
+
+    if (
+      attacker.playerControlled
+    ) {
+
+      attacker.combo++;
+
+      attacker.comboTimer =
+        COMBO_TIME;
+
+
+      game.maxCombo =
+        Math.max(
+          game.maxCombo,
+          attacker.combo
+        );
+
+
+      game.totalDamage += actual;
+
+
+      gainFury(
+        attacker,
+        actual
+      );
+
+
+      showDamage(actual);
+    }
+
+
+    game.cameraShake =
+      Math.min(
+        0.25,
+        game.cameraShake + 0.09
+      );
+
+
+    particlesBurst(
+
+      new THREE.Vector3(
+        this.group.position.x,
+        2.5,
+        0.5
+      ),
+
+      this.blocking
+        ? 0xb76cff
+        : 0xffbf3d,
+
+      this.blocking
+        ? 7
+        : 12
+    );
+
+
+    updateHUD();
+
+
+    if (
+      this.health <= 0
+    ) {
+
+      this.health = 0;
+
+      checkWinner();
+    }
+  }
+
+
+  /* ========================================================
+     FURY
+     ======================================================== */
+
+  useFury() {
+
+    const level =
+      Math.floor(this.fury);
+
+
+    if (
+      level < 1 ||
+      this.attacking ||
+      this.blocking ||
+      this.hitStun > 0
+    ) {
+
+      return;
+    }
+
+
+    this.fury = 0;
+
+    this.furyUsed += level;
+
+    this.attacking = true;
+
+    this.attack = "fury";
+
+    this.attackTime = 1.15;
+
+    this.hitConfirmed = false;
+
+
+    furyFlash.classList.remove(
+      "active"
+    );
+
+    void furyFlash.offsetWidth;
+
+    furyFlash.classList.add(
+      "active"
+    );
+
+
+    particlesBurst(
+
+      new THREE.Vector3(
+        this.group.position.x,
+        2.5,
+        0
+      ),
+
+      this.accent,
+
+      35
+    );
+
+
+    updateHUD();
+  }
+
+
+  /* ========================================================
+     ANIMATION
+     ======================================================== */
+
+  animate() {
+
+    const time =
+      performance.now() * 0.008;
+
+
+    /* ---------- BLOCK ---------- */
+
+    if (this.blocking) {
+
+      this.leftArm.rotation.x =
+        -0.7;
+
+      this.rightArm.rotation.x =
+        -0.7;
+
+      this.leftArm.rotation.z =
+        0.65;
+
+      this.rightArm.rotation.z =
+        -0.65;
+
+      return;
+    }
+
+
+    /* ---------- ATTACK ---------- */
+
     if (this.attacking) {
 
-      const duration =
-        this.attack === "punch"
-          ? .42
-          : this.attack === "kick"
-            ? .55
-            : 1.15;
-
       const progress =
-        THREE.MathUtils.clamp(
-          1 -
-          this.attackTime /
-          duration,
-          0,
-          1
+        1 -
+        this.attackTime /
+        (
+          this.attack === "punch"
+            ? 0.42
+            : this.attack === "kick"
+              ? 0.55
+              : 1.15
         );
+
 
       const swing =
         Math.sin(
-          progress * Math.PI
+          Math.min(
+            1,
+            progress
+          ) * Math.PI
         );
 
 
-      if (this.attack === "punch") {
+      /* PUNCH */
 
-        if (this.facing === 1) {
+      if (
+        this.attack === "punch"
+      ) {
+
+        if (
+          this.facing === 1
+        ) {
 
           this.rightArm.rotation.x =
             -1.7 * swing;
 
           this.rightArm.rotation.z =
-            -.3 * swing;
+            -0.3 * swing;
 
-        }
-        else {
+        } else {
 
           this.leftArm.rotation.x =
             -1.7 * swing;
 
           this.leftArm.rotation.z =
-            .3 * swing;
+            0.3 * swing;
         }
       }
 
 
-      if (this.attack === "kick") {
+      /* KICK */
 
-        if (this.facing === 1) {
+      if (
+        this.attack === "kick"
+      ) {
+
+        if (
+          this.facing === 1
+        ) {
 
           this.rightLeg.rotation.x =
             -1.45 * swing;
 
-        }
-        else {
+        } else {
 
           this.leftLeg.rotation.x =
             -1.45 * swing;
@@ -1341,13 +1813,17 @@ class Fighter {
       }
 
 
-      if (this.attack === "fury") {
+      /* FURY */
+
+      if (
+        this.attack === "fury"
+      ) {
 
         const pulse =
           1 +
-          Math.sin(
-            performance.now() * .025
-          ) * .08;
+          Math.sin(time * 4) *
+          0.08;
+
 
         this.body.scale.set(
           pulse,
@@ -1355,71 +1831,97 @@ class Fighter {
           pulse
         );
 
+
         this.leftArm.rotation.x =
           -1.4;
 
         this.rightArm.rotation.x =
           -1.4;
+
+        this.leftLeg.rotation.x =
+          -0.25;
+
+        this.rightLeg.rotation.x =
+          0.25;
       }
+
 
       return;
     }
 
+
+    /* ---------- JUMP ---------- */
 
     if (!this.grounded) {
 
-      this.leftLeg.rotation.x = -.3;
-      this.rightLeg.rotation.x = .3;
+      this.leftLeg.rotation.x =
+        -0.3;
+
+      this.rightLeg.rotation.x =
+        0.3;
 
       return;
     }
 
 
-    const walk =
-      Math.sin(this.walkTime);
+    /* ---------- WALK ---------- */
+
+    const walking =
+      Math.sin(
+        performance.now() * 0.012
+      );
+
 
     this.leftArm.rotation.x =
-      walk * .18;
+      walking * 0.18;
 
     this.rightArm.rotation.x =
-      -walk * .18;
+      -walking * 0.18;
+
 
     this.leftLeg.rotation.x =
-      -walk * .15;
+      -walking * 0.15;
 
     this.rightLeg.rotation.x =
-      walk * .15;
-  }
-
-
-  animateHit() {
-
-    this.torso.rotation.z =
-      .2 * this.facing;
-
-    this.leftArm.rotation.z =
-      .45;
-
-    this.rightArm.rotation.z =
-      -.45;
+      walking * 0.15;
   }
 
 
   /* ========================================================
-     FACE OPPONENT
-  ======================================================== */
+     HIT ANIMATION
+     ======================================================== */
+
+  animateHit() {
+
+    this.torso.rotation.z =
+      0.2 * this.facing;
+
+    this.leftArm.rotation.z =
+      0.45;
+
+    this.rightArm.rotation.z =
+      -0.45;
+  }
+
+
+  /* ========================================================
+     FACING
+     ======================================================== */
 
   faceOpponent(opponent) {
 
     if (this.attacking) {
+
       return;
     }
+
 
     this.facing =
       opponent.group.position.x >
       this.group.position.x
         ? 1
         : -1;
+
 
     this.group.rotation.y =
       this.facing === 1
@@ -1429,8 +1931,8 @@ class Fighter {
 
 
   /* ========================================================
-     LIMIT
-  ======================================================== */
+     ARENA LIMIT
+     ======================================================== */
 
   limitPosition() {
 
@@ -1441,7 +1943,9 @@ class Fighter {
         ARENA_LIMIT
       );
   }
+
 }
+      
 
 
 /* ============================================================
