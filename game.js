@@ -1,37 +1,31 @@
-see"use strict";
+"use strict";
 
 /* ============================================================
    IRON FURY
-   MATCHED GAME ENGINE
+   CLEAN 3D MOBILE FIGHTING ENGINE
    ============================================================ */
 
 const THREE = window.THREE;
 
-if (!THREE) {
-  throw new Error("Three.js failed to load.");
-}
-
 
 /* ============================================================
-   ELEMENT HELPER
-   ============================================================ */
+   DOM HELPER
+============================================================ */
 
 function $(id) {
-  const element = document.getElementById(id);
+  const el = document.getElementById(id);
 
-  if (!element) {
-    throw new Error(
-      "Iron Fury missing HTML element: #" + id
-    );
+  if (!el) {
+    throw new Error("Missing element: #" + id);
   }
 
-  return element;
+  return el;
 }
 
 
 /* ============================================================
    DOM
-   ============================================================ */
+============================================================ */
 
 const canvas = $("gameCanvas");
 
@@ -106,94 +100,71 @@ const furyButton = $("furyButton");
 
 /* ============================================================
    CONSTANTS
-   ============================================================ */
+============================================================ */
 
 const MAX_HEALTH = 100;
 const MAX_VITALITY = 100;
-
 const MAX_FURY = 3;
 
-const ARENA_LIMIT = 8.5;
+const ARENA_LIMIT = 8;
 
-const PLAYER_SPEED = 4.8;
-const ENEMY_SPEED = 3.2;
+const PLAYER_SPEED = 5;
+const ENEMY_SPEED = 3.1;
 
-const GRAVITY = 21;
-const JUMP_FORCE = 8;
+const GRAVITY = 22;
+const JUMP_FORCE = 8.5;
 
 const ROUND_TIME = 60;
-
 const COMBO_TIME = 1.15;
 
 
 /* ============================================================
-   GAME STATE
-   ============================================================ */
+   GAME
+============================================================ */
 
 const game = {
-
   running: false,
-
   paused: false,
-
   ended: false,
 
   time: ROUND_TIME,
-
   round: 1,
 
   maxCombo: 0,
-
   totalDamage: 0,
 
   cameraShake: 0
-
 };
 
 
 /* ============================================================
    INPUT
-   ============================================================ */
+============================================================ */
 
 const input = {
-
   left: false,
-
   right: false
-
 };
 
 const stick = {
-
   active: false,
-
   x: 0,
-
   y: 0
-
 };
 
 
 /* ============================================================
    RENDERER
-   ============================================================ */
+============================================================ */
 
-const renderer =
-  new THREE.WebGLRenderer({
-
-    canvas: canvas,
-
-    antialias: true,
-
-    powerPreference: "high-performance"
-
-  });
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true,
+  powerPreference: "high-performance"
+});
 
 renderer.setPixelRatio(
-  Math.min(
-    window.devicePixelRatio || 1,
-    2
-  )
+  Math.min(window.devicePixelRatio || 1, 2)
 );
 
 renderer.setSize(
@@ -202,47 +173,37 @@ renderer.setSize(
 );
 
 renderer.shadowMap.enabled = true;
-
-renderer.outputColorSpace =
-  THREE.SRGBColorSpace;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 
 /* ============================================================
    SCENE
-   ============================================================ */
+============================================================ */
 
-const scene =
-  new THREE.Scene();
+const scene = new THREE.Scene();
 
 scene.background =
-  new THREE.Color(
-    0x05080c
-  );
+  new THREE.Color(0x05080c);
 
 scene.fog =
   new THREE.Fog(
     0x05080c,
     15,
-    35
+    34
   );
 
 
 /* ============================================================
    CAMERA
-   ============================================================ */
+============================================================ */
 
 const camera =
   new THREE.PerspectiveCamera(
-
     45,
-
     window.innerWidth /
       window.innerHeight,
-
-    0.1,
-
+    .1,
     100
-
   );
 
 camera.position.set(
@@ -251,22 +212,16 @@ camera.position.set(
   13
 );
 
-camera.lookAt(
-  0,
-  2.2,
-  0
-);
-
 
 /* ============================================================
-   LIGHTING
-   ============================================================ */
+   LIGHT
+============================================================ */
 
 scene.add(
   new THREE.HemisphereLight(
     0x8fc8ff,
     0x101010,
-    1.8
+    2
   )
 );
 
@@ -279,7 +234,7 @@ const sun =
 sun.position.set(
   4,
   10,
-  7
+  8
 );
 
 sun.castShadow = true;
@@ -289,8 +244,8 @@ scene.add(sun);
 const blueLight =
   new THREE.PointLight(
     0x18aaff,
-    8,
-    15
+    7,
+    16
   );
 
 blueLight.position.set(
@@ -304,8 +259,8 @@ scene.add(blueLight);
 const redLight =
   new THREE.PointLight(
     0xff304d,
-    8,
-    15
+    7,
+    16
   );
 
 redLight.position.set(
@@ -319,18 +274,14 @@ scene.add(redLight);
 
 /* ============================================================
    MATERIAL
-   ============================================================ */
+============================================================ */
 
-function mat(color, metal = 0.15) {
+function mat(color, metal = .15) {
 
   return new THREE.MeshStandardMaterial({
-
-    color: color,
-
-    roughness: 0.58,
-
+    color,
+    roughness: .58,
     metalness: metal
-
   });
 
 }
@@ -338,18 +289,12 @@ function mat(color, metal = 0.15) {
 
 /* ============================================================
    ARENA
-   ============================================================ */
+============================================================ */
 
 const floor =
   new THREE.Mesh(
-
-    new THREE.PlaneGeometry(
-      22,
-      14
-    ),
-
-    mat(0x111920, 0.35)
-
+    new THREE.PlaneGeometry(22, 14),
+    mat(0x111920, .35)
   );
 
 floor.rotation.x =
@@ -360,9 +305,7 @@ floor.receiveShadow = true;
 scene.add(floor);
 
 
-/* ============================================================
-   GRID
-   ============================================================ */
+/* GRID */
 
 const grid =
   new THREE.GridHelper(
@@ -372,27 +315,21 @@ const grid =
     0x18252d
   );
 
-grid.position.y =
-  0.01;
+grid.position.y = .01;
 
 scene.add(grid);
 
 
-/* ============================================================
-   BACK WALL
-   ============================================================ */
+/* WALL */
 
 const backWall =
   new THREE.Mesh(
-
     new THREE.BoxGeometry(
       22,
       8,
-      0.5
+      .5
     ),
-
     mat(0x091016)
-
   );
 
 backWall.position.set(
@@ -401,49 +338,41 @@ backWall.position.set(
   -5
 );
 
-backWall.receiveShadow = true;
-
 scene.add(backWall);
 
 
-/* ============================================================
-   ARENA SIDE MARKERS
-   ============================================================ */
+/* ARENA LIGHTS */
 
-function arenaMarker(x) {
+function arenaLight(x, color) {
 
-  const marker =
+  const light =
     new THREE.Mesh(
-
       new THREE.BoxGeometry(
-        0.15,
+        .15,
         2.5,
-        0.15
+        .15
       ),
-
       new THREE.MeshBasicMaterial({
-        color: 0x28d7ff
+        color
       })
-
     );
 
-  marker.position.set(
+  light.position.set(
     x,
     1.25,
-    -0.4
+    -.4
   );
 
-  scene.add(marker);
-
+  scene.add(light);
 }
 
-arenaMarker(-9);
-arenaMarker(9);
+arenaLight(-9, 0x28d7ff);
+arenaLight(9, 0xff304d);
 
 
 /* ============================================================
    PARTICLES
-   ============================================================ */
+============================================================ */
 
 const particles = [];
 
@@ -453,52 +382,35 @@ function particlesBurst(
   count = 12
 ) {
 
-  for (
-    let i = 0;
-    i < count;
-    i++
-  ) {
+  for (let i = 0; i < count; i++) {
 
-    const p =
+    const particle =
       new THREE.Mesh(
-
         new THREE.SphereGeometry(
-          0.045,
+          .045,
           6,
           6
         ),
-
         new THREE.MeshBasicMaterial({
-          color: color
+          color
         })
-
       );
 
-    p.position.copy(
-      position
-    );
+    particle.position.copy(position);
 
-    p.userData.life =
-      0.35 +
-      Math.random() * 0.35;
+    particle.userData.life =
+      .25 + Math.random() * .4;
 
-    p.userData.velocity =
+    particle.userData.velocity =
       new THREE.Vector3(
-
-        (Math.random() - 0.5) * 4,
-
-        Math.random() * 4,
-
-        (Math.random() - 0.5) * 3
-
+        (Math.random() - .5) * 5,
+        Math.random() * 5,
+        (Math.random() - .5) * 3
       );
 
-    scene.add(p);
-
-    particles.push(p);
-
+    scene.add(particle);
+    particles.push(particle);
   }
-
 }
 
 function updateParticles(dt) {
@@ -509,11 +421,9 @@ function updateParticles(dt) {
     i--
   ) {
 
-    const p =
-      particles[i];
+    const p = particles[i];
 
-    p.userData.life -=
-      dt;
+    p.userData.life -= dt;
 
     p.userData.velocity.y -=
       10 * dt;
@@ -523,31 +433,22 @@ function updateParticles(dt) {
       dt
     );
 
-    if (
-      p.userData.life <= 0
-    ) {
+    if (p.userData.life <= 0) {
 
       scene.remove(p);
 
       p.geometry.dispose();
-
       p.material.dispose();
 
-      particles.splice(
-        i,
-        1
-      );
-
+      particles.splice(i, 1);
     }
-
   }
-
 }
 
 
 /* ============================================================
-   FIGHTER
-   ============================================================ */
+   FIGHTER CLASS
+============================================================ */
 
 class Fighter {
 
@@ -559,9 +460,7 @@ class Fighter {
   ) {
 
     this.name = name;
-
     this.color = color;
-
     this.accent = accent;
 
     this.playerControlled =
@@ -579,7 +478,6 @@ class Fighter {
     this.fury = 0;
 
     this.combo = 0;
-
     this.comboTimer = 0;
 
     this.grounded = true;
@@ -588,291 +486,276 @@ class Fighter {
       new THREE.Vector3();
 
     this.facing =
-      playerControlled
-        ? 1
-        : -1;
+      playerControlled ? 1 : -1;
 
     this.blocking = false;
 
     this.attacking = false;
-
     this.attack = null;
-
     this.attackTime = 0;
-
     this.hitConfirmed = false;
 
     this.hitStun = 0;
 
     this.dashTime = 0;
-
     this.invincible = false;
 
     this.damageDone = 0;
-
     this.furyUsed = 0;
+
+    this.walkTime = 0;
 
     this.createModel();
 
-    scene.add(
-      this.group
-    )
+    scene.add(this.group);
+  }
 
-    
-createModel() {
 
-  const skin = mat(0xc88968);
-  const suit = mat(this.color, 0.35);
-  const accent = mat(this.accent, 0.5);
-  const dark = mat(0x11161b, 0.4);
+  /* ========================================================
+     SIMPLE 3D FIGHTER
+  ======================================================== */
 
-  /* BODY */
+  createModel() {
 
-  this.body = new THREE.Group();
-  this.group.add(this.body);
+    const skin =
+      mat(0xc88968);
 
+    const suit =
+      mat(this.color, .35);
 
-  /* TORSO */
+    const accent =
+      mat(this.accent, .5);
 
-  this.torso = new THREE.Mesh(
-    new THREE.BoxGeometry(
-      1.05,
-      1.45,
-      0.58
-    ),
-    suit
-  );
+    const dark =
+      mat(0x11161b, .4);
 
-  this.torso.position.y = 2.55;
-  this.torso.castShadow = true;
 
-  this.body.add(this.torso);
+    /* BODY */
 
+    this.body =
+      new THREE.Group();
 
-  /* CHEST ARMOR */
+    this.group.add(this.body);
 
-  const chest = new THREE.Mesh(
-    new THREE.BoxGeometry(
-      0.72,
-      0.42,
-      0.64
-    ),
-    accent
-  );
 
-  chest.position.set(
-    0,
-    2.78,
-    0.3
-  );
+    /* TORSO */
 
-  chest.castShadow = true;
+    this.torso =
+      new THREE.Mesh(
+        new THREE.BoxGeometry(
+          1.05,
+          1.4,
+          .58
+        ),
+        suit
+      );
 
-  this.body.add(chest);
+    this.torso.position.y =
+      2.55;
 
+    this.torso.castShadow = true;
 
-  /* HEAD */
+    this.body.add(this.torso);
 
-  this.head = new THREE.Mesh(
-    new THREE.SphereGeometry(
-      0.42,
-      16,
-      12
-    ),
-    skin
-  );
 
-  this.head.position.y = 3.75;
-  this.head.castShadow = true;
+    /* HEAD */
 
-  this.body.add(this.head);
+    this.head =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          .42,
+          16,
+          12
+        ),
+        skin
+      );
 
+    this.head.position.y =
+      3.75;
 
-  /* VISOR */
+    this.head.castShadow = true;
 
-  const visor = new THREE.Mesh(
-    new THREE.BoxGeometry(
-      0.55,
-      0.14,
-      0.08
-    ),
-    dark
-  );
+    this.body.add(this.head);
 
-  visor.position.set(
-    0,
-    3.77,
-    0.39
-  );
 
-  this.body.add(visor);
+    /* FACE VISOR */
 
+    this.visor =
+      new THREE.Mesh(
+        new THREE.BoxGeometry(
+          .56,
+          .14,
+          .08
+        ),
+        dark
+      );
 
-  /* LEFT ARM */
+    this.visor.position.set(
+      0,
+      3.77,
+      .39
+    );
 
-  this.leftArm = this.limb(
-    0.19,
-    0.78,
-    suit
-  );
+    this.body.add(this.visor);
 
-  this.leftArm.position.set(
-    -0.68,
-    3.02,
-    0
-  );
 
+    /* CHEST */
 
-  /* RIGHT ARM */
+    this.chest =
+      new THREE.Mesh(
+        new THREE.BoxGeometry(
+          .72,
+          .4,
+          .64
+        ),
+        accent
+      );
+
+    this.chest.position.set(
+      0,
+      2.78,
+      .3
+    );
+
+    this.body.add(this.chest);
+
+
+    /* ARMS */
+
+    this.leftArm =
+      this.limb(
+        .19,
+        .78,
+        suit
+      );
+
+    this.rightArm =
+      this.limb(
+        .19,
+        .78,
+        suit
+      );
+
+    this.leftArm.position.set(
+      -.68,
+      3.02,
+      0
+    );
+
+    this.rightArm.position.set(
+      .68,
+      3.02,
+      0
+    );
+
+    this.body.add(
+      this.leftArm,
+      this.rightArm
+    );
+
+
+    /* FISTS */
+
+    this.leftFist =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          .2,
+          10,
+          8
+        ),
+        accent
+      );
+
+    this.rightFist =
+      this.leftFist.clone();
+
+    this.leftFist.position.y =
+      -.5;
+
+    this.rightFist.position.y =
+      -.5;
+
+    this.leftArm.add(
+      this.leftFist
+    );
+
+    this.rightArm.add(
+      this.rightFist
+    );
+
+
+    /* LEGS */
+
+    this.leftLeg =
+      this.limb(
+        .25,
+        1,
+        dark
+      );
+
+    this.rightLeg =
+      this.limb(
+        .25,
+        1,
+        dark
+      );
+
+    this.leftLeg.position.set(
+      -.3,
+      1.3,
+      0
+    );
+
+    this.rightLeg.position.set(
+      .3,
+      1.3,
+      0
+    );
+
+    this.body.add(
+      this.leftLeg,
+      this.rightLeg
+    );
+
+
+    /* FEET */
+
+    this.leftFoot =
+      new THREE.Mesh(
+        new THREE.BoxGeometry(
+          .34,
+          .2,
+          .58
+        ),
+        dark
+      );
+
+    this.rightFoot =
+      this.leftFoot.clone();
+
+    this.leftFoot.position.set(
+      0,
+      -.58,
+      .15
+    );
+
+    this.rightFoot.position.set(
+      0,
+      -.58,
+      .15
+    );
+
+    this.leftLeg.add(
+      this.leftFoot
+    );
+
+    this.rightLeg.add(
+      this.rightFoot
+    );
+
+    this.resetPose();
+  }
 
-  this.rightArm = this.limb(
-    0.19,
-    0.78,
-    suit
-  );
-
-  this.rightArm.position.set(
-    0.68,
-    3.02,
-    0
-  );
-
-  this.body.add(
-    this.leftArm,
-    this.rightArm
-  );
-
-
-  /* LEFT FIST */
-
-  this.leftFist = new THREE.Mesh(
-    new THREE.SphereGeometry(
-      0.2,
-      10,
-      8
-    ),
-    accent
-  );
-
-  this.leftFist.position.y = -0.5;
-
-  this.leftArm.add(
-    this.leftFist
-  );
-
-
-  /* RIGHT FIST */
-
-  this.rightFist = new THREE.Mesh(
-    new THREE.SphereGeometry(
-      0.2,
-      10,
-      8
-    ),
-    accent
-  );
-
-  this.rightFist.position.y = -0.5;
-
-  this.rightArm.add(
-    this.rightFist
-  );
-
-
-  /* LEFT LEG */
-
-  this.leftLeg = this.limb(
-    0.25,
-    1.0,
-    dark
-  );
-
-  this.leftLeg.position.set(
-    -0.3,
-    1.3,
-    0
-  );
-
-
-  /* RIGHT LEG */
-
-  this.rightLeg = this.limb(
-    0.25,
-    1.0,
-    dark
-  );
-
-  this.rightLeg.position.set(
-    0.3,
-    1.3,
-    0
-  );
-
-  this.body.add(
-    this.leftLeg,
-    this.rightLeg
-  );
-
-
-  /* LEFT FOOT */
-
-  this.leftFoot = new THREE.Mesh(
-    new THREE.BoxGeometry(
-      0.34,
-      0.2,
-      0.58
-    ),
-    dark
-  );
-
-  this.leftFoot.position.set(
-    0,
-    -0.58,
-    0.15
-  );
-
-  this.leftLeg.add(
-    this.leftFoot
-  );
-
-
-  /* RIGHT FOOT */
-
-  this.rightFoot = new THREE.Mesh(
-    new THREE.BoxGeometry(
-      0.34,
-      0.2,
-      0.58
-    ),
-    dark
-  );
-
-  this.rightFoot.position.set(
-    0,
-    -0.58,
-    0.15
-  );
-
-  this.rightLeg.add(
-    this.rightFoot
-  );
-
-
-  /* INITIAL POSE */
-
-  this.resetPose();
-
-}
-    
-
-  
-
-  
-
-  
-        
-    
-        
 
   limb(
     radius,
@@ -885,16 +768,13 @@ createModel() {
 
     const mesh =
       new THREE.Mesh(
-
         new THREE.CylinderGeometry(
           radius,
           radius,
           length,
           10
         ),
-
         material
-
       );
 
     mesh.position.y =
@@ -905,22 +785,21 @@ createModel() {
     pivot.add(mesh);
 
     return pivot;
-
   }
 
 
   resetPose() {
 
     this.leftArm.rotation.set(
-      0.1,
+      .1,
       0,
-      0.15
+      .15
     );
 
     this.rightArm.rotation.set(
-      0.1,
+      .1,
       0,
-      -0.15
+      -.15
     );
 
     this.leftLeg.rotation.set(
@@ -940,129 +819,12 @@ createModel() {
       1,
       1
     );
-
-  }
-
-
-  /* ========================================================
-     UPDATE
-     ======================================================== */
-
-  update(dt, opponent) {
-
-    if (
-      this.hitStun > 0
-    ) {
-
-      this.hitStun -= dt;
-
-      this.blocking = false;
-
-      this.physics(dt);
-
-      this.animateHit();
-
-      return;
-
-    }
-
-
-    if (
-      this.dashTime > 0
-    ) {
-
-      this.dashTime -= dt;
-
-      this.group.position.x +=
-        this.facing *
-        13 *
-        dt;
-
-      this.invincible = true;
-
-    } else {
-
-      this.invincible = false;
-
-    }
-
-
-    if (
-      this.attacking
-    ) {
-
-      this.updateAttack(
-        dt,
-        opponent
-      );
-
-    }
-
-
-    this.physics(dt);
-
-    this.faceOpponent(
-      opponent
-    );
-
-    this.animate();
-
-    this.limitPosition();
-
-    this.comboTimer -= dt;
-
-    if (
-      this.comboTimer <= 0
-    ) {
-
-      this.combo = 0;
-
-    }
-
-  }
-
-
-  /* ========================================================
-     PHYSICS
-     ======================================================== */
-
-  physics(dt) {
-
-    if (
-      !this.grounded
-    ) {
-
-      this.velocity.y -=
-        GRAVITY * dt;
-
-      this.group.position.y +=
-        this.velocity.y *
-        dt;
-
-      if (
-        this.group.position.y <=
-        0
-      ) {
-
-        this.group.position.y =
-          0;
-
-        this.velocity.y =
-          0;
-
-        this.grounded =
-          true;
-
-      }
-
-    }
-
   }
 
 
   /* ========================================================
      MOVEMENT
-     ======================================================== */
+  ======================================================== */
 
   move(direction, dt) {
 
@@ -1072,9 +834,7 @@ createModel() {
       this.hitStun > 0 ||
       this.dashTime > 0
     ) {
-
       return;
-
     }
 
     const speed =
@@ -1083,10 +843,11 @@ createModel() {
         : ENEMY_SPEED;
 
     this.group.position.x +=
-      direction *
-      speed *
-      dt;
+      direction * speed * dt;
 
+    if (direction !== 0) {
+      this.walkTime += dt * 9;
+    }
   }
 
 
@@ -1095,19 +856,16 @@ createModel() {
     if (
       !this.grounded ||
       this.attacking ||
-      this.blocking
+      this.blocking ||
+      this.hitStun > 0
     ) {
-
       return;
-
     }
 
     this.velocity.y =
       JUMP_FORCE;
 
-    this.grounded =
-      false;
-
+    this.grounded = false;
   }
 
 
@@ -1117,13 +875,11 @@ createModel() {
       this.dashTime > 0 ||
       this.hitStun > 0
     ) {
-
       return;
-
     }
 
     this.dashTime =
-      0.18;
+      .18;
 
     particlesBurst(
       new THREE.Vector3(
@@ -1134,7 +890,6 @@ createModel() {
       this.accent,
       8
     );
-
   }
 
 
@@ -1144,22 +899,17 @@ createModel() {
       this.attacking ||
       this.hitStun > 0
     ) {
-
       this.blocking = false;
-
       return;
-
     }
 
-    this.blocking =
-      value;
-
+    this.blocking = value;
   }
 
 
   /* ========================================================
-     ATTACK
-     ======================================================== */
+     ATTACKS
+  ======================================================== */
 
   startAttack(type) {
 
@@ -1168,55 +918,89 @@ createModel() {
       this.blocking ||
       this.hitStun > 0
     ) {
-
       return;
-
     }
 
     this.attacking = true;
-
     this.attack = type;
-
     this.hitConfirmed = false;
 
     this.attackTime =
       type === "punch"
-        ? 0.42
+        ? .42
         : type === "kick"
-          ? 0.55
+          ? .55
           : 1.15;
-
   }
 
 
-  updateAttack(
-    dt,
-    opponent
-  ) {
+  useFury() {
+
+    const level =
+      Math.floor(this.fury);
+
+    if (
+      level < 1 ||
+      this.attacking ||
+      this.blocking ||
+      this.hitStun > 0
+    ) {
+      return;
+    }
+
+    this.fury = 0;
+
+    this.furyUsed += level;
+
+    this.attacking = true;
+    this.attack = "fury";
+    this.attackTime = 1.15;
+    this.hitConfirmed = false;
+
+    furyFlash.classList.remove("active");
+
+    void furyFlash.offsetWidth;
+
+    furyFlash.classList.add("active");
+
+    particlesBurst(
+      new THREE.Vector3(
+        this.group.position.x,
+        2.5,
+        0
+      ),
+      this.accent,
+      35
+    );
+
+    updateHUD();
+  }
+
+
+  updateAttack(dt, opponent) {
 
     this.attackTime -= dt;
 
     const duration =
       this.attack === "punch"
-        ? 0.42
+        ? .42
         : this.attack === "kick"
-          ? 0.55
+          ? .55
           : 1.15;
 
     const progress =
       1 -
       this.attackTime /
-        duration;
+      duration;
 
 
     if (
       !this.hitConfirmed &&
-      progress > 0.3 &&
-      progress < 0.72
+      progress > .3 &&
+      progress < .72
     ) {
 
-      this.hitConfirmed =
-        true;
+      this.hitConfirmed = true;
 
       const distance =
         Math.abs(
@@ -1231,137 +1015,96 @@ createModel() {
             ? 3.2
             : 1.7;
 
-      if (
-        distance <= range
-      ) {
+      if (distance <= range) {
 
-        let damage = 0;
+        let damage;
 
-        if (
-          this.attack ===
-          "punch"
-        ) {
-
+        if (this.attack === "punch") {
           damage = 7;
-
-        } else if (
-          this.attack ===
-          "kick"
-        ) {
-
+        }
+        else if (this.attack === "kick") {
           damage = 10;
-
-        } else {
-
-          damage =
-            15 +
-            this.furyUsed * 8;
-
+        }
+        else {
+          damage = 15 + this.furyUsed * 8;
         }
 
         opponent.takeDamage(
           damage,
           this
         );
-
       }
-
     }
 
 
-    if (
-      this.attackTime <= 0
-    ) {
+    if (this.attackTime <= 0) {
 
-      this.attacking =
-        false;
-
+      this.attacking = false;
       this.attack = null;
-
       this.attackTime = 0;
 
-      this.body.scale.set(
-        1,
-        1,
-        1
-      );
-
+      this.resetPose();
     }
-
   }
 
 
   /* ========================================================
      DAMAGE
-     ======================================================== */
+  ======================================================== */
 
-  takeDamage(
-    damage,
-    attacker
-  ) {
+  takeDamage(damage, attacker) {
 
     if (
       this.invincible ||
       game.ended
     ) {
-
       return;
-
     }
 
-    let actual =
-      damage;
+    let actual = damage;
 
+    if (this.blocking) {
 
-    if (
-      this.blocking
-    ) {
-
-      actual *= 0.2;
+      actual *= .2;
 
       this.vitality =
         Math.max(
           0,
           this.vitality -
-            damage * 0.15
+          damage * .15
         );
 
-    } else {
+    }
+    else {
 
       this.vitality =
         Math.max(
           0,
           this.vitality -
-            damage * 0.08
+          damage * .08
         );
 
-      this.hitStun =
-        0.2;
+      this.hitStun = .2;
 
       this.velocity.x =
         attacker.facing * 2;
 
       this.comboTimer =
         COMBO_TIME;
-
     }
 
 
     this.health =
       Math.max(
         0,
-        this.health -
-          actual
+        this.health - actual
       );
 
 
-    attacker.damageDone +=
-      actual;
+    attacker.damageDone += actual;
 
 
-    if (
-      attacker.playerControlled
-    ) {
+    if (attacker.playerControlled) {
 
       attacker.combo++;
 
@@ -1374,252 +1117,237 @@ createModel() {
           attacker.combo
         );
 
-      game.totalDamage +=
-        actual;
+      game.totalDamage += actual;
 
       gainFury(
         attacker,
         actual
       );
 
-      showDamage(
-        actual
-      );
-
+      showDamage(actual);
     }
 
 
     game.cameraShake =
       Math.min(
-        0.25,
-        game.cameraShake +
-          0.09
+        .25,
+        game.cameraShake + .09
       );
 
 
     particlesBurst(
-
       new THREE.Vector3(
         this.group.position.x,
         2.5,
-        0.5
+        .5
       ),
-
       this.blocking
         ? 0xb76cff
         : 0xffbf3d,
-
       this.blocking
         ? 7
         : 12
-
     );
 
 
     updateHUD();
 
 
-    if (
-      this.health <= 0
-    ) {
+    if (this.health <= 0) {
 
       this.health = 0;
 
       checkWinner();
-
     }
-
   }
 
 
   /* ========================================================
-     FURY
-     ======================================================== */
+     PHYSICS
+  ======================================================== */
 
-  useFury() {
+  physics(dt) {
 
-    const level =
-      Math.floor(
-        this.fury
-      );
+    if (!this.grounded) {
 
-    if (
-      level < 1 ||
-      this.attacking ||
-      this.blocking ||
-      this.hitStun > 0
-    ) {
+      this.velocity.y -=
+        GRAVITY * dt;
 
-      return;
+      this.group.position.y +=
+        this.velocity.y * dt;
 
+      if (
+        this.group.position.y <= 0
+      ) {
+
+        this.group.position.y = 0;
+
+        this.velocity.y = 0;
+
+        this.grounded = true;
+      }
     }
 
-    this.fury = 0;
+    if (this.hitStun <= 0) {
+      this.velocity.x *= .8;
+    }
 
-    this.furyUsed +=
-      level;
+    this.group.position.x +=
+      this.velocity.x * dt;
+  }
 
-    this.attacking =
-      true;
 
-    this.attack =
-      "fury";
+  /* ========================================================
+     UPDATE
+  ======================================================== */
 
-    this.attackTime =
-      1.15;
+  update(dt, opponent) {
 
-    this.hitConfirmed =
-      false;
+    if (this.hitStun > 0) {
 
-    furyFlash.classList.remove(
-      "active"
-    );
+      this.hitStun -= dt;
 
-    void furyFlash.offsetWidth;
+      this.blocking = false;
 
-    furyFlash.classList.add(
-      "active"
-    );
+      this.physics(dt);
 
-    particlesBurst(
+      this.animateHit();
 
-      new THREE.Vector3(
-        this.group.position.x,
-        2.5,
-        0
-      ),
+      this.limitPosition();
 
-      this.accent,
+      return;
+    }
 
-      35
 
-    );
+    if (this.dashTime > 0) {
 
-    updateHUD();
+      this.dashTime -= dt;
 
+      this.group.position.x +=
+        this.facing * 13 * dt;
+
+      this.invincible = true;
+
+    }
+    else {
+
+      this.invincible = false;
+    }
+
+
+    if (this.attacking) {
+
+      this.updateAttack(
+        dt,
+        opponent
+      );
+    }
+
+
+    this.physics(dt);
+
+    this.faceOpponent(opponent);
+
+    this.animate();
+
+    this.limitPosition();
+
+
+    this.comboTimer -= dt;
+
+    if (this.comboTimer <= 0) {
+      this.combo = 0;
+    }
   }
 
 
   /* ========================================================
      ANIMATION
-     ======================================================== */
+  ======================================================== */
 
   animate() {
 
-    const time =
-      performance.now() *
-      0.008;
+    if (this.blocking) {
 
+      this.leftArm.rotation.x = -.7;
+      this.rightArm.rotation.x = -.7;
 
-    if (
-      this.blocking
-    ) {
-
-      this.leftArm.rotation.x =
-        -0.7;
-
-      this.rightArm.rotation.x =
-        -0.7;
-
-      this.leftArm.rotation.z =
-        0.65;
-
-      this.rightArm.rotation.z =
-        -0.65;
+      this.leftArm.rotation.z = .65;
+      this.rightArm.rotation.z = -.65;
 
       return;
-
     }
 
 
-    if (
-      this.attacking
-    ) {
+    if (this.attacking) {
+
+      const duration =
+        this.attack === "punch"
+          ? .42
+          : this.attack === "kick"
+            ? .55
+            : 1.15;
 
       const progress =
-        1 -
-        this.attackTime /
-          (
-            this.attack ===
-              "punch"
-              ? 0.42
-              : this.attack ===
-                  "kick"
-                ? 0.55
-                : 1.15
-          );
+        THREE.MathUtils.clamp(
+          1 -
+          this.attackTime /
+          duration,
+          0,
+          1
+        );
 
       const swing =
         Math.sin(
-          Math.min(
-            1,
-            progress
-          ) *
-          Math.PI
+          progress * Math.PI
         );
 
 
-      if (
-        this.attack ===
-        "punch"
-      ) {
+      if (this.attack === "punch") {
 
-        if (
-          this.facing === 1
-        ) {
+        if (this.facing === 1) {
 
           this.rightArm.rotation.x =
             -1.7 * swing;
 
           this.rightArm.rotation.z =
-            -0.3 * swing;
+            -.3 * swing;
 
-        } else {
+        }
+        else {
 
           this.leftArm.rotation.x =
             -1.7 * swing;
 
           this.leftArm.rotation.z =
-            0.3 * swing;
-
+            .3 * swing;
         }
-
       }
 
 
-      if (
-        this.attack ===
-        "kick"
-      ) {
+      if (this.attack === "kick") {
 
-        if (
-          this.facing === 1
-        ) {
+        if (this.facing === 1) {
 
           this.rightLeg.rotation.x =
             -1.45 * swing;
 
-        } else {
+        }
+        else {
 
           this.leftLeg.rotation.x =
             -1.45 * swing;
-
         }
-
       }
 
 
-      if (
-        this.attack ===
-        "fury"
-      ) {
+      if (this.attack === "fury") {
 
         const pulse =
           1 +
           Math.sin(
-            time * 4
-          ) *
-          0.08;
+            performance.now() * .025
+          ) * .08;
 
         this.body.scale.set(
           pulse,
@@ -1632,84 +1360,59 @@ createModel() {
 
         this.rightArm.rotation.x =
           -1.4;
-
-        this.leftLeg.rotation.x =
-          -0.25;
-
-        this.rightLeg.rotation.x =
-          0.25;
-
       }
 
       return;
-
     }
 
 
-    if (
-      !this.grounded
-    ) {
+    if (!this.grounded) {
 
-      this.leftLeg.rotation.x =
-        -0.3;
-
-      this.rightLeg.rotation.x =
-        0.3;
+      this.leftLeg.rotation.x = -.3;
+      this.rightLeg.rotation.x = .3;
 
       return;
-
     }
 
 
-    const walking =
-      Math.sin(
-        performance.now() *
-        0.012
-      );
+    const walk =
+      Math.sin(this.walkTime);
 
     this.leftArm.rotation.x =
-      walking * 0.18;
+      walk * .18;
 
     this.rightArm.rotation.x =
-      -walking * 0.18;
+      -walk * .18;
 
     this.leftLeg.rotation.x =
-      -walking * 0.15;
+      -walk * .15;
 
     this.rightLeg.rotation.x =
-      walking * 0.15;
-
+      walk * .15;
   }
 
 
   animateHit() {
 
     this.torso.rotation.z =
-      0.2 * this.facing;
+      .2 * this.facing;
 
     this.leftArm.rotation.z =
-      0.45;
+      .45;
 
     this.rightArm.rotation.z =
-      -0.45;
-
+      -.45;
   }
 
 
   /* ========================================================
-     FACING
-     ======================================================== */
+     FACE OPPONENT
+  ======================================================== */
 
-  faceOpponent(
-    opponent
-  ) {
+  faceOpponent(opponent) {
 
-    if (
-      this.attacking
-    ) {
-
+    if (this.attacking) {
       return;
-
     }
 
     this.facing =
@@ -1722,13 +1425,12 @@ createModel() {
       this.facing === 1
         ? 0
         : Math.PI;
-
   }
 
 
   /* ========================================================
      LIMIT
-     ======================================================== */
+  ======================================================== */
 
   limitPosition() {
 
@@ -1738,15 +1440,13 @@ createModel() {
         -ARENA_LIMIT,
         ARENA_LIMIT
       );
-
   }
-
 }
 
 
 /* ============================================================
-   CREATE FIGHTERS
-   ============================================================ */
+   FIGHTERS
+============================================================ */
 
 const player =
   new Fighter(
@@ -1764,16 +1464,10 @@ const enemy =
     false
   );
 
-player.group.position.x =
-  -3.8;
-
-enemy.group.position.x =
-  3.8;
-
 
 /* ============================================================
    FURY
-   ============================================================ */
+============================================================ */
 
 function gainFury(
   fighter,
@@ -1784,56 +1478,48 @@ function gainFury(
     Math.min(
       MAX_FURY,
       fighter.fury +
-        (damage >= 8
-          ? 0.16
-          : 0.1)
+      (damage >= 8 ? .16 : .1)
     );
 
   fighter.fury =
     Math.floor(
       fighter.fury * 10
     ) / 10;
-
 }
 
 
 /* ============================================================
-   PLAYER UPDATE
-   ============================================================ */
+   PLAYER
+============================================================ */
 
 function updatePlayer(dt) {
 
   let direction = 0;
 
   if (
-    stick.x < -0.2 ||
+    stick.x < -.2 ||
     input.left
   ) {
-
     direction -= 1;
-
   }
 
   if (
-    stick.x > 0.2 ||
+    stick.x > .2 ||
     input.right
   ) {
-
     direction += 1;
-
   }
 
   player.move(
     direction,
     dt
   );
-
 }
 
 
 /* ============================================================
    ENEMY AI
-   ============================================================ */
+============================================================ */
 
 let aiTimer = 0;
 
@@ -1841,17 +1527,14 @@ function updateEnemy(dt) {
 
   aiTimer -= dt;
 
-  if (
-    aiTimer > 0
-  ) {
-
+  if (aiTimer > 0) {
     return;
-
   }
 
   aiTimer =
-    0.15 +
-    Math.random() * 0.2;
+    .18 +
+    Math.random() * .22;
+
 
   const distance =
     player.group.position.x -
@@ -1861,9 +1544,7 @@ function updateEnemy(dt) {
     Math.abs(distance);
 
 
-  if (
-    absolute > 2
-  ) {
+  if (absolute > 2) {
 
     enemy.move(
       Math.sign(distance),
@@ -1871,7 +1552,6 @@ function updateEnemy(dt) {
     );
 
     return;
-
   }
 
 
@@ -1879,25 +1559,17 @@ function updateEnemy(dt) {
     Math.random();
 
 
-  if (
-    choice < 0.35
-  ) {
+  if (choice < .35) {
 
-    enemy.startAttack(
-      "punch"
-    );
+    enemy.startAttack("punch");
 
-  } else if (
-    choice < 0.55
-  ) {
+  }
+  else if (choice < .55) {
 
-    enemy.startAttack(
-      "kick"
-    );
+    enemy.startAttack("kick");
 
-  } else if (
-    choice < 0.72
-  ) {
+  }
+  else if (choice < .72) {
 
     enemy.block(true);
 
@@ -1906,20 +1578,17 @@ function updateEnemy(dt) {
       350
     );
 
-  } else if (
-    enemy.fury >= 1
-  ) {
+  }
+  else if (enemy.fury >= 1) {
 
     enemy.useFury();
-
   }
-
 }
 
 
 /* ============================================================
    CAMERA
-   ============================================================ */
+============================================================ */
 
 function updateCamera() {
 
@@ -1935,10 +1604,10 @@ function updateCamera() {
       enemy.group.position.x
     );
 
+
   const targetZ =
     THREE.MathUtils.clamp(
-      12 +
-        distance * 0.35,
+      12 + distance * .35,
       11,
       16
     );
@@ -1948,21 +1617,17 @@ function updateCamera() {
   let shakeY = 0;
 
 
-  if (
-    game.cameraShake > 0
-  ) {
+  if (game.cameraShake > 0) {
 
     shakeX =
-      (Math.random() - 0.5) *
+      (Math.random() - .5) *
       game.cameraShake;
 
     shakeY =
-      (Math.random() - 0.5) *
+      (Math.random() - .5) *
       game.cameraShake;
 
-    game.cameraShake *=
-      0.88;
-
+    game.cameraShake *= .88;
   }
 
 
@@ -1971,33 +1636,35 @@ function updateCamera() {
       center +
       shakeX -
       camera.position.x
-    ) * 0.08;
+    ) * .08;
+
 
   camera.position.y +=
     (
       4.7 +
       shakeY -
       camera.position.y
-    ) * 0.08;
+    ) * .08;
+
 
   camera.position.z +=
     (
       targetZ -
       camera.position.z
-    ) * 0.08;
+    ) * .08;
+
 
   camera.lookAt(
     center,
     2.2,
     0
   );
-
 }
 
 
 /* ============================================================
    HUD
-   ============================================================ */
+============================================================ */
 
 function updateHUD() {
 
@@ -2007,6 +1674,7 @@ function updateHUD() {
   enemyHealth.style.width =
     enemy.health + "%";
 
+
   playerVitality.style.width =
     player.vitality + "%";
 
@@ -2015,48 +1683,31 @@ function updateHUD() {
 
 
   playerHealthText.textContent =
-    Math.ceil(
-      player.health
-    );
+    Math.ceil(player.health);
 
   enemyHealthText.textContent =
-    Math.ceil(
-      enemy.health
-    );
+    Math.ceil(enemy.health);
+
 
   playerVitalityText.textContent =
-    Math.ceil(
-      player.vitality
-    );
+    Math.ceil(player.vitality);
 
   enemyVitalityText.textContent =
-    Math.ceil(
-      enemy.vitality
-    );
+    Math.ceil(enemy.vitality);
 
 
   playerFuryText.textContent =
-    Math.floor(
-      player.fury
-    ) +
-    " / 3";
+    Math.floor(player.fury) + " / 3";
 
   enemyFuryText.textContent =
-    Math.floor(
-      enemy.fury
-    ) +
-    " / 3";
+    Math.floor(enemy.fury) + " / 3";
 
 
   const playerFury =
-    Math.floor(
-      player.fury
-    );
+    Math.floor(player.fury);
 
   const enemyFury =
-    Math.floor(
-      enemy.fury
-    );
+    Math.floor(enemy.fury);
 
 
   const playerSlots = [
@@ -2084,7 +1735,6 @@ function updateHUD() {
         "ready",
         playerFury === 3
       );
-
     }
   );
 
@@ -2101,7 +1751,6 @@ function updateHUD() {
         "ready",
         enemyFury === 3
       );
-
     }
   );
 
@@ -2126,17 +1775,14 @@ function updateHUD() {
       0,
       Math.ceil(game.time)
     );
-
 }
 
 
 /* ============================================================
    DAMAGE DISPLAY
-   ============================================================ */
+============================================================ */
 
-function showDamage(
-  amount
-) {
+function showDamage(amount) {
 
   damageNumber.textContent =
     Math.round(amount);
@@ -2161,28 +1807,21 @@ function showDamage(
   damageFlash.classList.add(
     "active"
   );
-
 }
 
 
 /* ============================================================
    WINNER
-   ============================================================ */
+============================================================ */
 
 function checkWinner() {
 
-  if (
-    game.ended
-  ) {
-
+  if (game.ended) {
     return;
-
   }
 
 
-  if (
-    enemy.health <= 0
-  ) {
+  if (enemy.health <= 0) {
 
     finishOverlay.classList.remove(
       "hidden"
@@ -2195,27 +1834,22 @@ function checkWinner() {
       "THE RIVAL HAS FALLEN";
 
     return;
-
   }
 
 
-  if (
-    player.health <= 0
-  ) {
+  if (player.health <= 0) {
 
     endGame(
       false,
       "THE RIVAL WINS"
     );
-
   }
-
 }
 
 
 /* ============================================================
    FINISH
-   ============================================================ */
+============================================================ */
 
 finishButton.addEventListener(
   "click",
@@ -2228,17 +1862,13 @@ finishButton.addEventListener(
     game.ended = true;
 
     particlesBurst(
-
       new THREE.Vector3(
         enemy.group.position.x,
         2.5,
         0
       ),
-
       0x28d7ff,
-
       50
-
     );
 
     showMessage(
@@ -2246,6 +1876,7 @@ finishButton.addEventListener(
       "IRON FURY",
       1500
     );
+
 
     setTimeout(
       () => {
@@ -2258,22 +1889,54 @@ finishButton.addEventListener(
       },
       1200
     );
-
   }
 );
 
 
 /* ============================================================
+   MESSAGE
+============================================================ */
+
+let messageTimer = null;
+
+function showMessage(
+  title,
+  subtitle,
+  duration
+) {
+
+  message.textContent = title;
+  subMessage.textContent = subtitle;
+
+  clearTimeout(messageTimer);
+
+  messageTimer =
+    setTimeout(
+      () => {
+
+        message.textContent = "";
+        subMessage.textContent = "";
+
+      },
+      duration
+    );
+}
+
+
+/* ============================================================
    END GAME
-   ============================================================ */
+============================================================ */
 
 function endGame(
   victory,
   description
 ) {
 
-  game.ended =
-    true;
+  if (game.ended && resultOverlay.classList.contains("hidden") === false) {
+    return;
+  }
+
+  game.ended = true;
 
   resultTitle.textContent =
     victory
@@ -2287,9 +1950,7 @@ function endGame(
     game.maxCombo;
 
   resultDamage.textContent =
-    Math.round(
-      game.totalDamage
-    );
+    Math.round(game.totalDamage);
 
   resultFury.textContent =
     player.furyUsed;
@@ -2297,13 +1958,12 @@ function endGame(
   resultOverlay.classList.remove(
     "hidden"
   );
-
 }
 
 
 /* ============================================================
    RESTART
-   ============================================================ */
+============================================================ */
 
 function restartGame() {
 
@@ -2311,81 +1971,23 @@ function restartGame() {
   game.paused = false;
   game.ended = false;
 
-  game.time =
-    ROUND_TIME;
+  game.time = ROUND_TIME;
 
   game.maxCombo = 0;
-
   game.totalDamage = 0;
 
   game.cameraShake = 0;
 
-  player.health =
-    MAX_HEALTH;
 
-  player.vitality =
-    MAX_VITALITY;
-
-  player.fury = 0;
-
-  player.combo = 0;
-
-  player.comboTimer = 0;
-
-  player.furyUsed = 0;
-
-  player.attacking = false;
-
-  player.blocking = false;
-
-  player.hitStun = 0;
-
-  player.group.position.set(
-    -3.8,
-    0,
-    0
+  resetFighter(
+    player,
+    -3.8
   );
 
-  player.velocity.set(
-    0,
-    0,
-    0
+  resetFighter(
+    enemy,
+    3.8
   );
-
-  player.grounded = true;
-
-
-  enemy.health =
-    MAX_HEALTH;
-
-  enemy.vitality =
-    MAX_VITALITY;
-
-  enemy.fury = 0;
-
-  enemy.combo = 0;
-
-  enemy.furyUsed = 0;
-
-  enemy.attacking = false;
-
-  enemy.blocking = false;
-
-  enemy.hitStun = 0;
-
-  enemy.group.position.set(
-    3.8,
-    0,
-    0
-  );
-
-  enemy.velocity.set(
-    0,
-    0,
-    0
-  );
-
-  enemy.grounded = true;
 
 
   resultOverlay.classList.add(
@@ -2401,66 +2003,96 @@ function restartGame() {
   );
 
 
-  player.resetPose();
-  enemy.resetPose();
-
   updateHUD();
+
 
   showMessage(
     "ROUND 1",
     "FIGHT",
     1200
   );
+}
 
+
+function resetFighter(
+  fighter,
+  x
+) {
+
+  fighter.health =
+    MAX_HEALTH;
+
+  fighter.vitality =
+    MAX_VITALITY;
+
+  fighter.fury = 0;
+
+  fighter.combo = 0;
+  fighter.comboTimer = 0;
+
+  fighter.furyUsed = 0;
+
+  fighter.attacking = false;
+  fighter.blocking = false;
+
+  fighter.attack = null;
+  fighter.attackTime = 0;
+
+  fighter.hitStun = 0;
+
+  fighter.dashTime = 0;
+
+  fighter.velocity.set(
+    0,
+    0,
+    0
+  );
+
+  fighter.group.position.set(
+    x,
+    0,
+    0
+  );
+
+  fighter.grounded = true;
+
+  fighter.resetPose();
 }
 
 
 /* ============================================================
    PAUSE
-   ============================================================ */
+============================================================ */
 
-function setPaused(
-  paused
-) {
+function setPaused(value) {
 
-  game.paused =
-    paused;
+  game.paused = value;
 
   pauseMenu.classList.toggle(
     "hidden",
-    !paused
+    !value
   );
-
 }
 
 
 pauseButton.addEventListener(
   "click",
   () => {
-
-    setPaused(
-      !game.paused
-    );
-
+    setPaused(!game.paused);
   }
 );
-
 
 resumeButton.addEventListener(
   "click",
   () => {
-
     setPaused(false);
-
   }
 );
-
 
 pauseRestartButton.addEventListener(
   "click",
   restartGame
 );
-
 
 restartButton.addEventListener(
   "click",
@@ -2469,8 +2101,8 @@ restartButton.addEventListener(
 
 
 /* ============================================================
-   MOBILE BUTTONS
-   ============================================================ */
+   MOBILE BUTTON HELPER
+============================================================ */
 
 function pressButton(
   element,
@@ -2491,9 +2123,7 @@ function pressButton(
       down();
 
     },
-    {
-      passive: false
-    }
+    { passive: false }
   );
 
 
@@ -2510,9 +2140,7 @@ function pressButton(
       up();
 
     },
-    {
-      passive: false
-    }
+    { passive: false }
   );
 
 
@@ -2528,7 +2156,6 @@ function pressButton(
 
     }
   );
-
 }
 
 
@@ -2571,7 +2198,7 @@ pressButton(
 
 /* ============================================================
    KEYBOARD
-   ============================================================ */
+============================================================ */
 
 window.addEventListener(
   "keydown",
@@ -2581,87 +2208,69 @@ window.addEventListener(
       event.code === "ArrowLeft" ||
       event.code === "KeyA"
     ) {
-
       input.left = true;
-
     }
+
 
     if (
       event.code === "ArrowRight" ||
       event.code === "KeyD"
     ) {
-
       input.right = true;
-
     }
+
 
     if (
       event.code === "Space" &&
       !event.repeat
     ) {
-
       player.jump();
-
     }
+
 
     if (
       event.code === "ShiftLeft" &&
       !event.repeat
     ) {
-
       player.dash();
-
     }
+
 
     if (
       event.code === "KeyJ" &&
       !event.repeat
     ) {
-
-      player.startAttack(
-        "punch"
-      );
-
+      player.startAttack("punch");
     }
+
 
     if (
       event.code === "KeyK" &&
       !event.repeat
     ) {
-
-      player.startAttack(
-        "kick"
-      );
-
+      player.startAttack("kick");
     }
 
-    if (
-      event.code === "KeyL"
-    ) {
 
+    if (event.code === "KeyL") {
       player.block(true);
-
     }
+
 
     if (
       event.code === "KeyF" &&
       !event.repeat
     ) {
-
       player.useFury();
-
     }
+
 
     if (
-      event.code === "Escape"
+      event.code === "Escape" &&
+      !event.repeat
     ) {
-
-      setPaused(
-        !game.paused
-      );
-
+      setPaused(!game.paused);
     }
-
   }
 );
 
@@ -2674,35 +2283,28 @@ window.addEventListener(
       event.code === "ArrowLeft" ||
       event.code === "KeyA"
     ) {
-
       input.left = false;
-
     }
+
 
     if (
       event.code === "ArrowRight" ||
       event.code === "KeyD"
     ) {
-
       input.right = false;
-
     }
 
-    if (
-      event.code === "KeyL"
-    ) {
 
+    if (event.code === "KeyL") {
       player.block(false);
-
     }
-
   }
 );
 
 
 /* ============================================================
    JOYSTICK
-   ============================================================ */
+============================================================ */
 
 function updateStick(
   x,
@@ -2727,7 +2329,7 @@ function updateStick(
     y - centerY;
 
   const radius =
-    rect.width * 0.34;
+    rect.width * .34;
 
   const distance =
     Math.sqrt(
@@ -2736,9 +2338,7 @@ function updateStick(
     );
 
 
-  if (
-    distance > radius
-  ) {
+  if (distance > radius) {
 
     dx =
       dx /
@@ -2749,7 +2349,6 @@ function updateStick(
       dy /
       distance *
       radius;
-
   }
 
 
@@ -2766,21 +2365,18 @@ function updateStick(
     "px), calc(-50% + " +
     dy +
     "px))";
-
 }
 
 
 function resetStick() {
 
-  stick.active =
-    false;
+  stick.active = false;
 
   stick.x = 0;
   stick.y = 0;
 
   joystickKnob.style.transform =
     "translate(-50%, -50%)";
-
 }
 
 
@@ -2790,8 +2386,7 @@ joystick.addEventListener(
 
     event.preventDefault();
 
-    stick.active =
-      true;
+    stick.active = true;
 
     joystick.setPointerCapture(
       event.pointerId
@@ -2801,11 +2396,8 @@ joystick.addEventListener(
       event.clientX,
       event.clientY
     );
-
   },
-  {
-    passive: false
-  }
+  { passive: false }
 );
 
 
@@ -2813,12 +2405,8 @@ joystick.addEventListener(
   "pointermove",
   event => {
 
-    if (
-      !stick.active
-    ) {
-
+    if (!stick.active) {
       return;
-
     }
 
     event.preventDefault();
@@ -2827,11 +2415,8 @@ joystick.addEventListener(
       event.clientX,
       event.clientY
     );
-
   },
-  {
-    passive: false
-  }
+  { passive: false }
 );
 
 
@@ -2847,8 +2432,42 @@ joystick.addEventListener(
 
 
 /* ============================================================
+   TIMER
+============================================================ */
+
+function updateTimer(dt) {
+
+  game.time -= dt;
+
+  if (game.time <= 0) {
+
+    game.time = 0;
+
+    if (
+      player.health >=
+      enemy.health
+    ) {
+
+      endGame(
+        true,
+        "TIME VICTORY"
+      );
+
+    }
+    else {
+
+      endGame(
+        false,
+        "TIME DEFEAT"
+      );
+    }
+  }
+}
+
+
+/* ============================================================
    RESIZE
-   ============================================================ */
+============================================================ */
 
 window.addEventListener(
   "resize",
@@ -2871,67 +2490,26 @@ window.addEventListener(
         2
       )
     );
-
   }
 );
 
 
 /* ============================================================
-   TIMER
-   ============================================================ */
-
-function updateTimer(dt) {
-
-  game.time -= dt;
-
-  if (
-    game.time <= 0
-  ) {
-
-    game.time = 0;
-
-    if (
-      player.health >=
-      enemy.health
-    ) {
-
-      endGame(
-        true,
-        "TIME VICTORY"
-      );
-
-    } else {
-
-      endGame(
-        false,
-        "TIME DEFEAT"
-      );
-
-    }
-
-  }
-
-}
-
-
-/* ============================================================
    MAIN LOOP
-   ============================================================ */
+============================================================ */
 
 let previous =
   performance.now();
 
+
 function loop(now) {
 
-  requestAnimationFrame(
-    loop
-  );
+  requestAnimationFrame(loop);
 
   const dt =
     Math.min(
-      0.05,
-      (now - previous) /
-        1000
+      .05,
+      (now - previous) / 1000
     );
 
   previous = now;
@@ -2958,7 +2536,6 @@ function loop(now) {
     );
 
     updateTimer(dt);
-
   }
 
 
@@ -2970,20 +2547,19 @@ function loop(now) {
     scene,
     camera
   );
-
 }
 
 
 /* ============================================================
    STARTUP
-   ============================================================ */
+============================================================ */
 
 function initialize() {
 
+  let progress = 0;
+
   loadingText.textContent =
     "INITIALIZING ENGINE";
-
-  let progress = 0;
 
 
   const interval =
@@ -2992,46 +2568,33 @@ function initialize() {
 
         progress += 10;
 
-        if (
-          progress >= 30
-        ) {
-
+        if (progress >= 30) {
           loadingText.textContent =
             "BUILDING ARENA";
-
         }
 
-        if (
-          progress >= 60
-        ) {
-
+        if (progress >= 60) {
           loadingText.textContent =
             "LOADING FIGHTERS";
-
         }
 
-        if (
-          progress >= 85
-        ) {
-
+        if (progress >= 85) {
           loadingText.textContent =
             "ARMING FURY SYSTEM";
-
         }
 
-        if (
-          progress >= 100
-        ) {
 
-          clearInterval(
-            interval
-          );
+        loadingProgress.style.width =
+          progress + "%";
 
-          loadingProgress.style.width =
-            "100%";
+
+        if (progress >= 100) {
+
+          clearInterval(interval);
 
           loadingText.textContent =
             "READY";
+
 
           setTimeout(
             () => {
@@ -3045,24 +2608,17 @@ function initialize() {
             },
             350
           );
-
-        } else {
-
-          loadingProgress.style.width =
-            progress + "%";
-
         }
 
       },
-      80
+      70
     );
-
 }
 
 
 /* ============================================================
    BOOT
-   ============================================================ */
+============================================================ */
 
 try {
 
@@ -3074,10 +2630,11 @@ try {
 
   initialize();
 
-} catch (error) {
+}
+catch (error) {
 
   console.error(
-    "IRON FURY STARTUP ERROR:",
+    "IRON FURY ERROR:",
     error
   );
 
@@ -3086,5 +2643,4 @@ try {
 
   loadingProgress.style.width =
     "100%";
-
 }
