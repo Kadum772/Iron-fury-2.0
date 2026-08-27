@@ -1,455 +1,236 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
-  >
-
-  <title>Iron Fury 3D</title>
-
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebForge — Premium Websites</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- LOADING -->
+<header class="navbar">
+  <div class="logo">WEB<span>FORGE</span></div>
 
-  <div id="loadingScreen" class="loading-screen">
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#templates">Templates</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </nav>
 
-    <div class="loading-card">
+  <button class="nav-btn" onclick="scrollToTemplates()">View Sites</button>
+</header>
 
-      <div class="logo">
-        IRON <span>FURY</span>
-      </div>
+<main>
 
-      <div
-        id="loadingText"
-        class="loading-text"
-      >
-        INITIALIZING ENGINE
-      </div>
+<section id="home" class="hero">
+  <div class="hero-content">
+    <p class="eyebrow">WE BUILD. YOU LAUNCH.</p>
 
-      <div class="loading-track">
+    <h1>Professional websites<br><span>without the headache.</span></h1>
 
-        <div
-          id="loadingProgress"
-          class="loading-progress"
-        ></div>
+    <p class="hero-text">
+      Choose a ready-made website, customize it for your brand,
+      and launch your online presence faster.
+    </p>
 
-      </div>
+    <div class="hero-buttons">
+      <button class="primary-btn" onclick="scrollToTemplates()">
+        Browse Websites
+      </button>
 
+      <button class="secondary-btn" onclick="showContact()">
+        Custom Website
+      </button>
     </div>
-
   </div>
 
-
-  <!-- GAME -->
-
-  <canvas id="gameCanvas"></canvas>
-
-
-  <!-- HUD -->
-
-  <div class="hud">
-
-    <!-- PLAYER -->
-
-    <div class="fighter-hud player-hud">
-
-      <div class="name-row">
-
-        <strong>IRON FURY</strong>
-
-        <span id="playerHealthText">
-          100
-        </span>
-
-      </div>
-
-      <div class="bar health">
-        <div id="playerHealth"></div>
-      </div>
-
-      <div class="bar vitality">
-        <div id="playerVitality"></div>
-      </div>
-
-      <div class="vitality-label">
-        VITALITY
-        <span id="playerVitalityText">
-          100
-        </span>
-      </div>
-
-      <div class="fury-row">
-
-        <div id="fury1" class="fury-slot"></div>
-        <div id="fury2" class="fury-slot"></div>
-        <div id="fury3" class="fury-slot"></div>
-
-        <span id="playerFuryText">
-          0 / 3
-        </span>
-
-      </div>
-
+  <div class="hero-card">
+    <div class="browser-top">
+      <i></i><i></i><i></i>
     </div>
 
+    <div class="browser-content">
+      <div class="mini-title"></div>
+      <div class="mini-line"></div>
+      <div class="mini-line short"></div>
 
-    <!-- CENTER -->
-
-    <div class="center-hud">
-
-      <div
-        id="roundNumber"
-        class="round"
-      >
-        ROUND 1
+      <div class="mini-boxes">
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
-
-      <div
-        id="timer"
-        class="timer"
-      >
-        60
-      </div>
-
     </div>
+  </div>
+</section>
 
 
-    <!-- ENEMY -->
-
-    <div class="fighter-hud enemy-hud">
-
-      <div class="name-row">
-
-        <strong>RIVAL</strong>
-
-        <span id="enemyHealthText">
-          100
-        </span>
-
-      </div>
-
-      <div class="bar health">
-
-        <div id="enemyHealth"></div>
-
-      </div>
-
-      <div class="bar vitality">
-
-        <div id="enemyVitality"></div>
-
-      </div>
-
-      <div class="vitality-label">
-
-        VITALITY
-
-        <span id="enemyVitalityText">
-          100
-        </span>
-
-      </div>
-
-      <div class="fury-row right">
-
-        <span id="enemyFuryText">
-          0 / 3
-        </span>
-
-        <div
-          id="enemyFury1"
-          class="fury-slot"
-        ></div>
-
-        <div
-          id="enemyFury2"
-          class="fury-slot"
-        ></div>
-
-        <div
-          id="enemyFury3"
-          class="fury-slot"
-        ></div>
-
-      </div>
-
-    </div>
-
-
-    <!-- PAUSE -->
-
-    <button
-      id="pauseButton"
-      class="pause-button"
-    >
-      Ⅱ
-    </button>
-
-
-    <!-- COMBO -->
-
-    <div
-      id="comboCounter"
-      class="combo-counter"
-    >
-
-      <span>COMBO</span>
-
-      <b id="comboNumber">
-        0
-      </b>
-
-    </div>
-
-
-    <!-- DAMAGE -->
-
-    <div
-      id="damageNumber"
-      class="damage-number"
-    >
-      0
-    </div>
-
-
-    <div
-      id="damageFlash"
-      class="damage-flash"
-    ></div>
-
-
-    <div
-      id="furyFlash"
-      class="fury-flash"
-    ></div>
-
-
-    <!-- ROUND MESSAGE -->
-
-    <div class="message-wrap">
-
-      <div
-        id="message"
-        class="message"
-      >
-        ROUND 1
-      </div>
-
-      <div
-        id="subMessage"
-        class="sub-message"
-      >
-        FIGHT
-      </div>
-
-    </div>
-
+<section id="templates" class="section">
+  <div class="section-heading">
+    <p class="eyebrow">OUR COLLECTION</p>
+    <h2>Websites ready to launch</h2>
+    <p>Pick a design and make it yours.</p>
   </div>
 
+  <div class="products">
 
-  <!-- MOBILE CONTROLS -->
+    <article class="product">
+      <div class="preview business">
+        <div class="preview-nav">BUSINESS</div>
+        <div class="preview-heading">Grow Your Business</div>
+        <div class="preview-button"></div>
+      </div>
 
-  <div class="mobile-controls">
+      <div class="product-info">
+        <span class="tag">BUSINESS</span>
+        <h3>Business Pro</h3>
+        <p>Modern website for small businesses and services.</p>
 
-    <div
-      id="joystick"
-      class="joystick"
-    >
-
-      <div class="joystick-ring"></div>
-
-      <div
-        id="joystickKnob"
-        class="joystick-knob"
-      ></div>
-
-    </div>
-
-
-    <div class="action-buttons">
-
-      <button
-        id="jumpButton"
-        class="control jump"
-      >
-        JUMP
-      </button>
-
-      <button
-        id="dashButton"
-        class="control dash"
-      >
-        DASH
-      </button>
-
-      <button
-        id="punchButton"
-        class="control punch"
-      >
-        P
-      </button>
-
-      <button
-        id="kickButton"
-        class="control kick"
-      >
-        K
-      </button>
-
-      <button
-        id="blockButton"
-        class="control block"
-      >
-        B
-      </button>
-
-      <button
-        id="furyButton"
-        class="control fury"
-      >
-        FURY
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- PAUSE MENU -->
-
-  <div
-    id="pauseMenu"
-    class="overlay hidden"
-  >
-
-    <div class="panel">
-
-      <h1>PAUSED</h1>
-
-      <p>IRON FURY</p>
-
-      <button
-        id="resumeButton"
-        class="menu-button"
-      >
-        RESUME
-      </button>
-
-      <button
-        id="pauseRestartButton"
-        class="menu-button secondary"
-      >
-        RESTART
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- RESULT -->
-
-  <div
-    id="resultOverlay"
-    class="overlay hidden"
-  >
-
-    <div class="panel result-panel">
-
-      <h1 id="resultTitle">
-        VICTORY
-      </h1>
-
-      <p id="resultDescription">
-        TIME VICTORY
-      </p>
-
-      <div class="stats">
-
-        <div>
-          MAX COMBO
-          <b id="resultCombo">0</b>
+        <div class="product-bottom">
+          <strong>$59</strong>
+          <button onclick="order('Business Pro', 59)">Order</button>
         </div>
+      </div>
+    </article>
 
-        <div>
-          DAMAGE
-          <b id="resultDamage">0</b>
-        </div>
 
-        <div>
-          FURY USED
-          <b id="resultFury">0</b>
-        </div>
-
+    <article class="product">
+      <div class="preview creator">
+        <div class="preview-nav">CREATOR</div>
+        <div class="creator-circle"></div>
+        <div class="preview-heading">Create. Share. Grow.</div>
+        <div class="preview-button"></div>
       </div>
 
-      <button
-        id="restartButton"
-        class="menu-button"
-      >
-        FIGHT AGAIN
-      </button>
+      <div class="product-info">
+        <span class="tag">CREATOR</span>
+        <h3>Creator Hub</h3>
+        <p>Portfolio and landing page for creators and gamers.</p>
 
+        <div class="product-bottom">
+          <strong>$49</strong>
+          <button onclick="order('Creator Hub', 49)">Order</button>
+        </div>
+      </div>
+    </article>
+
+
+    <article class="product">
+      <div class="preview restaurant">
+        <div class="preview-nav">RESTAURANT</div>
+        <div class="food-circle"></div>
+        <div class="preview-heading">Taste Something Great</div>
+        <div class="preview-button"></div>
+      </div>
+
+      <div class="product-info">
+        <span class="tag">RESTAURANT</span>
+        <h3>Restaurant Menu</h3>
+        <p>Beautiful menu and landing page for restaurants.</p>
+
+        <div class="product-bottom">
+          <strong>$69</strong>
+          <button onclick="order('Restaurant Menu', 69)">Order</button>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+
+<section id="pricing" class="pricing-section">
+  <div class="section-heading">
+    <p class="eyebrow">SIMPLE PRICING</p>
+    <h2>Choose your website</h2>
+  </div>
+
+  <div class="pricing-grid">
+
+    <div class="price-card">
+      <h3>Starter</h3>
+      <div class="price">$29</div>
+      <p>Simple landing page</p>
+      <ul>
+        <li>✓ Mobile friendly</li>
+        <li>✓ Modern design</li>
+        <li>✓ HTML/CSS</li>
+        <li>✓ GitHub Pages ready</li>
+      </ul>
+      <button onclick="order('Starter Website', 29)">Choose</button>
+    </div>
+
+    <div class="price-card featured">
+      <div class="popular">POPULAR</div>
+      <h3>Professional</h3>
+      <div class="price">$59</div>
+      <p>Complete business website</p>
+      <ul>
+        <li>✓ Responsive design</li>
+        <li>✓ Interactive features</li>
+        <li>✓ Custom branding</li>
+        <li>✓ Deployment assistance</li>
+      </ul>
+      <button onclick="order('Professional Website', 59)">Choose</button>
+    </div>
+
+    <div class="price-card">
+      <h3>Custom</h3>
+      <div class="price">$99+</div>
+      <p>Built around your idea</p>
+      <ul>
+        <li>✓ Custom design</li>
+        <li>✓ Custom features</li>
+        <li>✓ Multiple pages</li>
+        <li>✓ Personalization</li>
+      </ul>
+      <button onclick="showContact()">Contact Us</button>
     </div>
 
   </div>
+</section>
 
 
-  <!-- FINISH -->
+<section id="contact" class="contact">
+  <p class="eyebrow">READY TO START?</p>
+  <h2>Let's build your website.</h2>
+  <p>Tell us what you need and we'll help you choose the right option.</p>
 
-  <div
-    id="finishOverlay"
-    class="overlay hidden finish-overlay"
-  >
+  <button class="primary-btn" onclick="showContact()">
+    Start an Order
+  </button>
+</section>
 
-    <div class="panel">
+</main>
 
-      <h1 id="finishTitle">
-        FURY FINISH
-      </h1>
 
-      <p id="finishSubtitle">
-        THE RIVAL IS DOWN
-      </p>
+<footer>
+  <div class="logo">WEB<span>FORGE</span></div>
+  <p>© 2026 WebForge. Websites made simple.</p>
+</footer>
 
-      <button
-        id="finishButton"
-        class="menu-button"
-      >
-        FINISH
+
+<div id="orderModal" class="modal">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">×</button>
+
+    <p class="eyebrow">ORDER REQUEST</p>
+    <h2 id="modalTitle">Website</h2>
+    <p id="modalPrice"></p>
+
+    <form onsubmit="submitOrder(event)">
+      <input id="customerName" type="text" placeholder="Your name" required>
+      <input id="customerEmail" type="email" placeholder="Your email" required>
+      <textarea id="customerMessage" placeholder="Tell us what you want customized"></textarea>
+
+      <button class="primary-btn" type="submit">
+        Send Order Request
       </button>
-
-    </div>
-
+    </form>
   </div>
+</div>
 
-
-  <div class="help">
-
-    MOVE: JOYSTICK / WASD ·
-    PUNCH: J ·
-    KICK: K ·
-    BLOCK: L ·
-    DASH: SHIFT ·
-    JUMP: SPACE ·
-    FURY: F
-
-  </div>
-
-
-  <!-- THREE.JS -->
-
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-
-  <!-- GAME -->
-
-  <script src="game.js"></script>
-
+<script src="script.js"></script>
 </body>
 </html>
